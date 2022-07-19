@@ -19,4 +19,86 @@ entries:
     urls:
     - https://github.com/yutianaiqingtian/bigdata-charts/releases/download/hdfs-1.0.1/hdfs-1.0.1.tgz
     version: 1.0.1
-generated: "2022-07-18T05:23:11.920173754Z"
+  hive:
+  - apiVersion: v2
+    appVersion: 2.3.6
+    created: "2022-07-19T07:01:38.01711403Z"
+    dependencies:
+    - alias: metastore
+      condition: metastore.enabled
+      name: hive-metastore
+      repository: file://../hive-metastore
+      version: ~0.1.3
+    - condition: hdfs.enabled
+      name: hdfs
+      repository: file://../hdfs
+      version: ~1.0.0
+    description: The Apache Hive ™ data warehouse software facilitates reading, writing,
+      and managing large datasets residing in distributed storage using SQL. Structure
+      can be projected onto data already in storage. A command line tool and JDBC
+      driver are provided to connect users to Hive.
+    digest: b7fa8bccfff7f175fae9409ed2686a6d5f348649221c9c099e90ca49e8988c47
+    home: https://hive.apache.org/
+    icon: https://hive.apache.org/images/hive_logo_medium.jpg
+    maintainers:
+    - email: itzhang89@163.com
+      name: itzhang89
+    name: hive
+    sources:
+    - https://github.com/apache/hive
+    - https://github.com/gradiant/charts
+    - https://github.com/big-data-europe/docker-hive
+    urls:
+    - https://github.com/yutianaiqingtian/bigdata-charts/releases/download/hive-0.1.6/hive-0.1.6.tgz
+    version: 0.1.6
+  hive-metastore:
+  - apiVersion: v2
+    appVersion: 2.3.6
+    created: "2022-07-19T07:01:38.187506305Z"
+    dependencies:
+    - name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: ~11.6.0
+    description: The Apache Hive ™ data warehouse software facilitates reading, writing,
+      and managing large datasets residing in distributed storage using SQL. Structure
+      can be projected onto data already in storage. A command line tool and JDBC
+      driver are provided to connect users to Hive.
+    digest: 1cc73e7cd1e27a84e60d6c54dee49d5a4d2657dde5b355bab7d57bfd1e5f4cee
+    home: https://hive.apache.org/
+    icon: https://hive.apache.org/images/hive_logo_medium.jpg
+    maintainers:
+    - email: itzhang89@163.com
+      name: itzhang89
+    name: hive-metastore
+    sources:
+    - https://github.com/apache/hive
+    - https://github.com/gradiant/charts
+    - https://github.com/big-data-europe/docker-hive
+    urls:
+    - https://github.com/yutianaiqingtian/bigdata-charts/releases/download/hive-metastore-0.1.3/hive-metastore-0.1.3.tgz
+    version: 0.1.3
+  hue:
+  - apiVersion: v1
+    appVersion: "1"
+    created: "2022-07-19T07:01:38.39582144Z"
+    description: Hue is an SQL Cloud Editor for Data Warehouses and Databases.
+    digest: 56343eabd7980db7234df4715f2298841f32887ef260be69069334e71bc236cb
+    home: http://gethue.com/
+    icon: https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png
+    keywords:
+    - Hue
+    - SQL
+    - Editor
+    - Catalog
+    - Visualization
+    maintainers:
+    - email: romain.rigaux@gmail.com
+      name: romainr
+    name: hue
+    sources:
+    - https://github.com/cloudera/hue
+    - https://hub.docker.com/u/gethue
+    urls:
+    - https://github.com/yutianaiqingtian/bigdata-charts/releases/download/hue-1.0.3/hue-1.0.3.tgz
+    version: 1.0.3
+generated: "2022-07-19T07:01:38.395930841Z"
