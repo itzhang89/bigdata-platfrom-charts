@@ -101,4 +101,35 @@ entries:
     urls:
     - https://github.com/yutianaiqingtian/bigdata-charts/releases/download/hue-1.0.3/hue-1.0.3.tgz
     version: 1.0.3
-generated: "2022-07-19T07:01:38.395930841Z"
+  spark:
+  - annotations:
+      category: Infrastructure
+    apiVersion: v2
+    appVersion: 3.2.1
+    created: "2022-07-20T14:21:45.433244718Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 1.x.x
+    description: Apache Spark is a high-performance engine for large-scale computing
+      tasks, such as data processing, machine learning and real-time data streaming.
+      It includes APIs for Java, Python, Scala and R.
+    digest: cb713835ce14eac3da2a4871bfc7cf50bcf697323e8ad61a0a40b9ab45f2b149
+    home: https://github.com/bitnami/charts/tree/master/bitnami/spark
+    icon: https://bitnami.com/assets/stacks/spark/img/spark-stack-220x234.png
+    keywords:
+    - apache
+    - spark
+    maintainers:
+    - name: Bitnami
+      url: https://github.com/bitnami/charts
+    name: spark
+    sources:
+    - https://github.com/bitnami/bitnami-docker-spark
+    - https://spark.apache.org/
+    urls:
+    - https://github.com/yutianaiqingtian/bigdata-charts/releases/download/spark-6.1.10/spark-6.1.10.tgz
+    version: 6.1.10
+generated: "2022-07-20T14:21:45.433253818Z"
