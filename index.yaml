@@ -21,6 +21,37 @@ entries:
     version: 1.0.1
   hive:
   - apiVersion: v2
+    appVersion: 3.1.3
+    created: "2022-07-24T13:21:56.326872688Z"
+    dependencies:
+    - alias: metastore
+      condition: metastore.enabled
+      name: hive-metastore
+      repository: https://yutianaiqingtian.github.io/bigdata-charts
+      version: ~0.1.4
+    - condition: hdfs.enabled
+      name: hdfs
+      repository: https://yutianaiqingtian.github.io/bigdata-charts
+      version: ~1.0.0
+    description: The Apache Hive ™ data warehouse software facilitates reading, writing,
+      and managing large datasets residing in distributed storage using SQL. Structure
+      can be projected onto data already in storage. A command line tool and JDBC
+      driver are provided to connect users to Hive.
+    digest: c146da32c79ea0690fd3d9681d6e34e9f5c1abd27ed5b4cf231d03c85f3332aa
+    home: https://hive.apache.org/
+    icon: https://hive.apache.org/images/hive_logo_medium.jpg
+    maintainers:
+    - email: itzhang89@163.com
+      name: itzhang89
+    name: hive
+    sources:
+    - https://github.com/apache/hive
+    - https://github.com/big-data-europe/docker-hive
+    - https://github.com/yutianaiqingtian/bigdata-charts
+    urls:
+    - https://github.com/yutianaiqingtian/bigdata-charts/releases/download/hive-0.1.7/hive-0.1.7.tgz
+    version: 0.1.7
+  - apiVersion: v2
     appVersion: 2.3.6
     created: "2022-07-19T07:01:38.01711403Z"
     dependencies:
@@ -210,4 +241,4 @@ entries:
     urls:
     - https://github.com/yutianaiqingtian/bigdata-charts/releases/download/superset-0.6.3/superset-0.6.3.tgz
     version: 0.6.3
-generated: "2022-07-24T13:19:06.711527901Z"
+generated: "2022-07-24T13:21:56.326896288Z"
