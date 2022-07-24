@@ -1,0 +1,178 @@
+image:
+  repository: nginx
+  tag: 1.23
+  pullPolicy: IfNotPresent
+service:
+  port: 80
+  type: ClusterIP
+serviceAccount:
+  create>: false
+ingress:
+  enabled: false
+autoscaling:
+  enabled: false
+
+postgresql:
+  enabled: true
+
+hdfs:
+  enabled: true
+  conf:
+    coreSite:
+      hadoop.proxyuser.httpfs.hosts: "*"
+      hadoop.proxyuser.httpfs.groups: "*"
+      hadoop.proxyuser.hue.hosts: "*"
+      hadoop.proxyuser.hue.groups: "*"
+
+    hdfsSite:
+      dfs.permissions.enabled: false
+      dfs.webhdfs.enable: true
+      dfs.replication: 3
+    httpfsSite:
+      httpfs.proxyuser.hue.hosts: "*"
+      httpfs.proxyuser.hue.groups: "*"
+hive:
+  enabled: true
+  metastore:
+    postgresql:
+      enabled: false
+      host: postgresql-interval
+      port: 5432
+      database: "metastore"
+      username: "hive"
+      password: "hive"
+  conf:
+    hiveSite:
+      hive.metastore.warehouse.dir: hdfs://my-hdfs.bigdata.svc.cluster.local:9820/user/hive/warehouse
+      hive.metastore.schema.verification: false
+spark:
+  enabled: true
+
+airflow:
+  defaultAirflowRepository: 5200710/airflow
+  defaultAirflowTag: "2.3.2"
+  # Not recommended for production
+  postgresql:
+    enabled: false
+
+  # Airflow database & redis config
+  data:
+    # Otherwise, pass connection values in
+    metadataConnection:
+      user: airflow
+      pass: Airflow@2022
+      db: airflow
+      sslmode: disable
+
+  images:
+    gitSync:
+      repository: 5200710/git-sync
+      tag: v3.4.0
+      pullPolicy: IfNotPresent
+
+hue:
+  enabled: true
+  hue:
+    replicas: 1
+    ini: |
+      [desktop]
+      secret_key=hue123
+      app_blacklist=spark,zookeeper,hbase,impala,search,pig,sqoop,security
+      django_debug_mode=false
+      gunicorn_work_class=sync
+      enable_prometheus=true
+
+      [[task_server]]
+      enabled=false
+      broker_url=redis://redis:6379/0
+      result_cache='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://redis:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
+      celery_result_backend=redis://redis:6379/0
+
+      [[custom]]
+      [[auth]]
+      backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
+
+      [[ldap]]
+      ldap_url=ldap://10.204.202.50:389
+      search_bind_authentication=true
+      use_start_tls=false
+      create_users_on_login=true
+      base_dn="ou=databu,dc=cdp50,dc=demo,dc=com"
+      bind_dn="cn=admin,dc=cdp50,dc=demo,dc=com"
+      bind_password=Root@2022
+      test_ldap_user="cn=admin,dc=cdp50,dc=demo,dc=com"
+      test_ldap_group="cn=openldap,dc=cdp50,dc=demo,dc=com"
+
+      [[[users]]]
+      user_filter="objectClass=posixAccount"
+      user_name_attr="uid"
+
+      [[[groups]]]
+      group_filter="objectClass=posixGroup"
+      group_name_attr="cn"
+      group_member_attr="memberUid"
+
+      [beeswax]
+      # Host where HiveServer2 is running.
+      hive_server_host=my-hive-server
+      # Port where HiveServer2 Thrift server runs on.
+      hive_server_port=10000
+      thrift_version=7
+
+      [notebook]
+      [[interpreters]]
+      [[[hive]]]
+      name=Hive
+      interface=hiveserver2
+
+      [hadoop]
+      [[hdfs_clusters]]
+      [[[default]]]
+      fs_defaultfs=hdfs://my-hdfs.bigdata.svc.cluster.local:9820
+      webhdfs_url=http://my-hdfs-httpfs.bigdata.svc.cluster.local:14000/webhdfs/v1
+
+superset:
+  enabled: true
+  init:
+    adminUser:
+      password: Root@2022
+  bootstrapScript: |
+    #!/bin/bash
+    apt-get update -y && apt-get install -y libsasl2-dev python-dev libldap2-dev libssl-dev && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install \
+      psycopg2-binary==2.9.1 \
+      python-ldap==3.4.0 \
+      redis==3.5.3 && \
+    if [ ! -f ~/bootstrap ]; then echo "Running Superset with uid {{ .Values.runAsUser }}" > ~/bootstrap; fi
+  # A dictionary of overrides to append at the end of superset_config.py - the name does not matter
+  configOverrides:
+    # Generate your own secret key for encryption. Use openssl rand -base64 42 to generate a good key
+    secret: |
+      SECRET_KEY = 'sOpgvM1hGAohEXS2fafKH3IS8gUAaKHU4mYFTr7h1FsM9gT2tp7N6v1S'
+    enable_oauth: |
+      # 引入AUTH_LDAP
+      from flask_appbuilder.security.manager import AUTH_DB,AUTH_LDAP
+
+      # 修改LDAP配置
+      AUTH_TYPE = AUTH_LDAP
+
+      # Uncomment to setup Full admin role name
+      AUTH_ROLE_ADMIN = 'admin'
+
+      # 打开自注册配置
+      # Will allow user self registration
+      AUTH_USER_REGISTRATION = True
+
+      # 打开此注释，并改为admin角色
+      # The default user self registration role
+      AUTH_USER_REGISTRATION_ROLE = "admin"
+
+      # When using LDAP Auth, setup the ldap server
+      AUTH_LDAP_SERVER = "ldap://10.204.202.50:389"
+      AUTH_LDAP_SEARCH = "ou=databu,dc=cdp50,dc=demo,dc=com"
+      AUTH_LDAP_UID_FIELD = "cn"
+
+      # 绑定某个初始账号，我这里用的app组织的账号，跟上面People不是同一个ou,无所谓，能登录就行，主要是不希望配置个人账号到应用里。
+      AUTH_LDAP_BIND_USER = "cn=admin,dc=cdp50,dc=demo,dc=com"
+      AUTH_LDAP_BIND_PASSWORD = "Root@2022"
