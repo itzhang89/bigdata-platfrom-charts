@@ -30,6 +30,10 @@ postgresql:
           CREATE USER hue WITH ENCRYPTED PASSWORD 'Hue@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE hue TO hue;
 
+          CREATE DATABASE superset;
+          CREATE USER superset WITH ENCRYPTED PASSWORD 'Superset@2022' LOGIN;
+          GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
+          
           flush privileges;
 
 openldap:
@@ -230,6 +234,8 @@ airflow:
 
 hue:
   enabled: true
+  postgresql:
+    enabled: false
   hue:
     replicas: 1
     ini: |
@@ -291,9 +297,16 @@ hue:
 
 superset:
   enabled: true
+  postgresql:
+    enabled: false
   init:
     adminUser:
       password: Root@2022
+  supersetNode:
+    connections:
+      # You need to change below configuration incase bringing own PostgresSQL instance and also set postgresql.enabled:false
+      db_host: '{{ template "platform.fullname" . }}-postgresql'
+      db_pass: Superset@2022
   bootstrapScript: |
     #!/bin/bash
     apt-get update -y && apt-get install -y libsasl2-dev python-dev libldap2-dev libssl-dev && \
@@ -334,3 +347,10 @@ superset:
       # 绑定某个初始账号，我这里用的app组织的账号，跟上面People不是同一个ou,无所谓，能登录就行，主要是不希望配置个人账号到应用里。
       AUTH_LDAP_BIND_USER = "cn=admin,dc=demo,dc=com"
       AUTH_LDAP_BIND_PASSWORD = "Root@2022"
+
+jupyter:
+  enabled: false
+kafka-connect-ui:
+  enabled: false
+opentsdb:
+  enabled: false
