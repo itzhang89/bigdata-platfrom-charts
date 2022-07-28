@@ -14,6 +14,92 @@ autoscaling:
 
 postgresql:
   enabled: true
+  primary:
+    initdb:
+      scripts:
+        db_init.sql: |
+          CREATE DATABASE airflow;
+          CREATE USER airflow WITH ENCRYPTED PASSWORD 'Airflow@2022' LOGIN;
+          GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
+
+          CREATE DATABASE metastore;
+          CREATE USER metastore WITH ENCRYPTED PASSWORD 'Metastore@2022' LOGIN;
+          GRANT ALL PRIVILEGES ON DATABASE metastore TO metastore;
+
+          CREATE DATABASE hue;
+          CREATE USER hue WITH ENCRYPTED PASSWORD 'Hue@2022' LOGIN;
+          GRANT ALL PRIVILEGES ON DATABASE hue TO hue;
+
+          flush privileges;
+
+openldap:
+  enabled: true
+  adminPassword: Root@2022
+  configPassword: Root@2022
+  env:
+    LDAP_ORGANISATION: "Training Inc."
+    LDAP_DOMAIN: "demo.com"
+    LDAP_TLS_VERIFY_CLIENT: "try"
+  customLdifFiles:
+    01-default-users.ldif: |-
+      # Entry 2: ou=databu,dc=demo,dc=com
+      dn: ou=databu,dc=demo,dc=com
+      objectclass: organizationalUnit
+      objectclass: top
+      ou: databu
+      # Entry 3: cn=Admin,ou=databu,dc=demo,dc=com
+      dn: cn=Admin,ou=databu,dc=demo,dc=com
+      cn: Admin
+      gidnumber: 501
+      memberuid: zjh
+      objectclass: posixGroup
+      objectclass: top
+      
+      # Entry 3: cn=yhj,ou=databu,dc=demo,dc=com
+      dn: cn=yhj,ou=databu,dc=demo,dc=com
+      cn: yhj
+      gidnumber: 500
+      givenname: y
+      homedirectory: /home/users/yhj
+      loginshell: /bin/bash
+      objectclass: inetOrgPerson
+      objectclass: posixAccount
+      objectclass: top
+      sn: hj
+      uid: yhj
+      uidnumber: 1001
+      userpassword: {MD5}lOjN5GErP9OQZ31C57IgAg==
+      
+      # Entry 4: cn=zhy,ou=databu,dc=demo,dc=com
+      dn: cn=zhy,ou=databu,dc=demo,dc=com
+      cn: zhy
+      gidnumber: 500
+      givenname: z
+      homedirectory: /home/users/zhy
+      loginshell: /bin/bash
+      objectclass: inetOrgPerson
+      objectclass: posixAccount
+      objectclass: top
+      sn: hy
+      uid: zhy
+      uidnumber: 1007
+      userpassword: {MD5}lOjN5GErP9OQZ31C57IgAg==
+      
+      # Entry 5: cn=zjh,ou=databu,dc=demo,dc=com
+      dn: cn=zjh,ou=databu,dc=demo,dc=com
+      cn: zjh
+      employeetype: Admin
+      gidnumber: 500
+      givenname: z
+      homedirectory: /home/users/zjh
+      loginshell: /bin/bash
+      objectclass: inetOrgPerson
+      objectclass: posixAccount
+      objectclass: top
+      sn: jh
+      uid: zjh
+      uidnumber: 1000
+      userpassword: {MD5}lOjN5GErP9OQZ31C57IgAg==
 
 hdfs:
   enabled: true
@@ -49,26 +135,98 @@ spark:
   enabled: true
 
 airflow:
+  # Secrets for all airflow containers
+  secret:
+    - envName: "AIRFLOW_CONN_S3"
+      secretName: "my-airflow-s3-connections"
+      secretKey: "AIRFLOW_CONN_S3"
+
+  # Default airflow repository -- overrides all the specific images below
   defaultAirflowRepository: 5200710/airflow
-  defaultAirflowTag: "2.3.2"
+  # Default airflow tag to deploy
+  defaultAirflowTag: "2.3.0"
+  # Airflow version (Used to make some decisions based on Airflow Version being deployed)
+  airflowVersion: "2.3.0"
+
   # Not recommended for production
   postgresql:
-    enabled: false
+    enabled: true
+    postgresqlPassword: Root@2022
+    postgresqlUsername: postgres
 
   # Airflow database & redis config
   data:
     # Otherwise, pass connection values in
     metadataConnection:
-      user: airflow
-      pass: Airflow@2022
-      db: airflow
+      user: postgres
+      pass: Root@2022
+      db: postgres
       sslmode: disable
+
+  # Airflow webserver settings
+  webserver:
+    defaultUser:
+      enabled: true
+      role: Admin
+      username: itzhang89
+      email: itzhang89@163.com
+      firstName: Super
+      lastName: Admin
+      password: Root@2022
+    # This string (can be templated) will be mounted into the Airflow Webserver as a custom
+    # webserver_config.py. You can bake a webserver_config.py in to your image instead.
+    webserverConfig: |
+      from flask_appbuilder.security.manager import AUTH_LDAP
+
+      AUTH_TYPE = AUTH_LDAP
+      AUTH_LDAP_SERVER = "ldap://10.204.202.50:389"
+      AUTH_LDAP_USE_TLS = False
+
+      # searches
+      AUTH_LDAP_SEARCH = "ou=databu,dc=demo,dc=com"  # the LDAP search base
+      AUTH_LDAP_UID_FIELD = "uid"  # the username field
+
+      # For a typical OpenLDAP setup (where LDAP searches require a special account):
+      AUTH_LDAP_BIND_USER = "cn=admin,dc=demo,dc=com"  # the special bind username for search
+      AUTH_LDAP_BIND_PASSWORD = "Root@2022"  # the special bind password for search
+
+      # registration configs
+      AUTH_USER_REGISTRATION = True  # allow users who are not already in the FAB DB
+      AUTH_USER_REGISTRATION_ROLE = "Admin"  # this role will be given in addition to any AUTH_ROLES_MAPPING
+      AUTH_LDAP_FIRSTNAME_FIELD = "givenName"
+      AUTH_LDAP_LASTNAME_FIELD = "sn"
+      AUTH_LDAP_EMAIL_FIELD = "mail"  # if null in LDAP, email is set to: "{username}@email.notfound"
+
+      # a mapping from LDAP DN to a list of FAB roles
+      AUTH_ROLES_MAPPING = {
+          "cn=openldap,ou=databu,dc=demo,dc=com": ["User"],
+          "cn=Admin": ["Admin"]
+      }
+
+      # the LDAP user attribute which has their role DNs
+      AUTH_LDAP_GROUP_FIELD = "memberOf"
+
+      # if we should replace ALL the user's roles each login, or only on registration
+      AUTH_ROLES_SYNC_AT_LOGIN = True
+
+      # force users to re-auth after 30min of inactivity (to keep roles in sync)
+      PERMANENT_SESSION_LIFETIME = 1800
+
+  # random create by python3 -c 'import secrets; print(secrets.token_hex(16))'
+  webserverSecretKey: 8e74ab588296bd461aff914a7af2755d
 
   images:
     gitSync:
       repository: 5200710/git-sync
       tag: v3.4.0
       pullPolicy: IfNotPresent
+
+  config:
+    core:
+      logging_level: 'DEBUG'
+      fab_logging_level: 'DEBUG'
+      load_examples: 'True'
+      colored_console_log: 'True'
 
 hue:
   enabled: true
@@ -97,11 +255,11 @@ hue:
       search_bind_authentication=true
       use_start_tls=false
       create_users_on_login=true
-      base_dn="ou=databu,dc=cdp50,dc=demo,dc=com"
-      bind_dn="cn=admin,dc=cdp50,dc=demo,dc=com"
+      base_dn="ou=databu,dc=demo,dc=com"
+      bind_dn="cn=admin,dc=demo,dc=com"
       bind_password=Root@2022
-      test_ldap_user="cn=admin,dc=cdp50,dc=demo,dc=com"
-      test_ldap_group="cn=openldap,dc=cdp50,dc=demo,dc=com"
+      test_ldap_user="cn=admin,dc=demo,dc=com"
+      test_ldap_group="cn=openldap,dc=demo,dc=com"
 
       [[[users]]]
       user_filter="objectClass=posixAccount"
@@ -170,9 +328,9 @@ superset:
 
       # When using LDAP Auth, setup the ldap server
       AUTH_LDAP_SERVER = "ldap://10.204.202.50:389"
-      AUTH_LDAP_SEARCH = "ou=databu,dc=cdp50,dc=demo,dc=com"
+      AUTH_LDAP_SEARCH = "ou=databu,dc=demo,dc=com"
       AUTH_LDAP_UID_FIELD = "cn"
 
       # 绑定某个初始账号，我这里用的app组织的账号，跟上面People不是同一个ou,无所谓，能登录就行，主要是不希望配置个人账号到应用里。
-      AUTH_LDAP_BIND_USER = "cn=admin,dc=cdp50,dc=demo,dc=com"
+      AUTH_LDAP_BIND_USER = "cn=admin,dc=demo,dc=com"
       AUTH_LDAP_BIND_PASSWORD = "Root@2022"

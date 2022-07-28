@@ -29,6 +29,10 @@ dependencies:
     version: ~11.6.0
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
+  - name: openldap
+    version: ~2.0.4
+    repository: https://yutianaiqingtian.github.io/bigdata-charts
+    condition: openldap.enabled
   - name: hdfs
     version: ~1.0.1
     repository: https://mehrwertmacher.github.io/bigdata-charts
