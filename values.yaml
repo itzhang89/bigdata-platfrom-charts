@@ -1,19 +1,13 @@
-image:
-  repository: nginx
-  tag: 1.23
-  pullPolicy: IfNotPresent
-service:
-  port: 80
-  type: ClusterIP
 serviceAccount:
   create>: false
-ingress:
-  enabled: false
-autoscaling:
-  enabled: false
 
-postgresql:
+postgresql-interval:
   enabled: true
+  auth:
+    postgresPassword: "Root@2022"
+    database: "training"
+    username: "training"
+    password: "Training@2022"
   primary:
     initdb:
       scripts:
@@ -21,21 +15,20 @@ postgresql:
           CREATE DATABASE airflow;
           CREATE USER airflow WITH ENCRYPTED PASSWORD 'Airflow@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
-
+          
           CREATE DATABASE metastore;
-          CREATE USER metastore WITH ENCRYPTED PASSWORD 'Metastore@2022' LOGIN;
-          GRANT ALL PRIVILEGES ON DATABASE metastore TO metastore;
-
+          CREATE USER hive WITH ENCRYPTED PASSWORD 'Hive@2022' LOGIN;
+          GRANT ALL PRIVILEGES ON DATABASE metastore TO hive;
+          
           CREATE DATABASE hue;
           CREATE USER hue WITH ENCRYPTED PASSWORD 'Hue@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE hue TO hue;
-
+          
           CREATE DATABASE superset;
           CREATE USER superset WITH ENCRYPTED PASSWORD 'Superset@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
           
           flush privileges;
-
 openldap:
   enabled: true
   adminPassword: Root@2022
@@ -124,13 +117,15 @@ hdfs:
 hive:
   enabled: true
   metastore:
+    enabled: true
     postgresql:
       enabled: false
-      host: postgresql-interval
+      host: '{{ template "postgresql.primary.fullname" . }}-postgresql'
       port: 5432
-      database: "metastore"
-      username: "hive"
-      password: "hive"
+      auth:
+        database: "metastore"
+        username: "hive"
+        password: "Hive@2022"
   conf:
     hiveSite:
       hive.metastore.warehouse.dir: hdfs://my-hdfs.bigdata.svc.cluster.local:9820/user/hive/warehouse
@@ -139,6 +134,7 @@ spark:
   enabled: true
 
 airflow:
+  enabled: true
   # Secrets for all airflow containers
   secret:
     - envName: "AIRFLOW_CONN_S3"
@@ -294,7 +290,10 @@ hue:
       [[[default]]]
       fs_defaultfs=hdfs://my-hdfs.bigdata.svc.cluster.local:9820
       webhdfs_url=http://my-hdfs-httpfs.bigdata.svc.cluster.local:14000/webhdfs/v1
-
+  aws:
+    accessKeyId: ""
+    secretAccessKey: ""
+    awsRegion: "us-east-1"
 superset:
   enabled: true
   postgresql:
@@ -305,7 +304,7 @@ superset:
   supersetNode:
     connections:
       # You need to change below configuration incase bringing own PostgresSQL instance and also set postgresql.enabled:false
-      db_host: '{{ template "platform.fullname" . }}-postgresql'
+      db_host: '{{ template "platform.postgresql-interval" . }}'
       db_pass: Superset@2022
   bootstrapScript: |
     #!/bin/bash
@@ -347,7 +346,8 @@ superset:
       # 绑定某个初始账号，我这里用的app组织的账号，跟上面People不是同一个ou,无所谓，能登录就行，主要是不希望配置个人账号到应用里。
       AUTH_LDAP_BIND_USER = "cn=admin,dc=demo,dc=com"
       AUTH_LDAP_BIND_PASSWORD = "Root@2022"
-
+hbase:
+  enabled: false
 jupyter:
   enabled: false
 kafka-connect-ui:

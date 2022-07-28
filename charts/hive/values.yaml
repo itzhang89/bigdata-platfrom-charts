@@ -8,10 +8,14 @@ resources: { }
 # Also deploy an internal postgresql hive-metastore requirement
 metastore:
   enabled: true
-postgresql:
-  postgresqlUsername: hive
-  postgresqlPassword: hive
-  postgresqlDatabase: metastore
+  postgresql:
+    enabled: false
+    host: ~
+    port: 5432
+    auth:
+      database: "metastore"
+      username: "hive"
+      password: "hive"
 #####################################################
 # Also deploy hdfs requirement
 hdfs:
