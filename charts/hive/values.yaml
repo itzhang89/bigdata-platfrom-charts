@@ -23,10 +23,10 @@ hdfs:
 
 conf:
   logLevel: INFO
-  hiveSite: {}
-    # if not set, default hive.metastore.uris is default uri from metastore requirement:
-    # "thrift://{{.Release.Name}}-metastore:9083"
-    # hive.metastore.warehouse.dir: hdfs://my-hdfs.bigdata.svc.cluster.local:9820/user/hive/warehouse
+  hiveSite: { }
+  # if not set, default hive.metastore.uris is default uri from metastore requirement:
+  # "thrift://{{.Release.Name}}-metastore:9083"
+  # hive.metastore.warehouse.dir: hdfs://my-hdfs.bigdata.svc.cluster.local:9820/user/hive/warehouse
   hdfsAdminUser: hdfs
   # if not set, default is configMap from hdfs requirement {{.Release.Name}}-hdfs-hadoop
   hadoopConfigMap: ~

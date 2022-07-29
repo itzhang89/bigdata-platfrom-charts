@@ -38,8 +38,7 @@ dependencies:
     repository: https://mehrwertmacher.github.io/bigdata-charts
     condition: hdfs.enabled
   - name: hive
-    version: ~0.1.7
-#    repository: https://yutianaiqingtian.github.io/bigdata-charts
+    version: ~0.1.8
     condition: hive.enabled
   - name: spark
     version: ~6.1.5
@@ -51,7 +50,6 @@ dependencies:
 #    condition: airflow.enabled
   - name: hue
     version: ~1.0.3
-#    repository: https://yutianaiqingtian.github.io/bigdata-charts
     condition: hue.enabled
   - name: superset
     version: ~0.6.3
