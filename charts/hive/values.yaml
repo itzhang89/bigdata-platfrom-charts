@@ -6,10 +6,10 @@ image:
 resources: { }
 
 # Also deploy an internal postgresql hive-metastore requirement
-metastore:
+hive-metastore:
   enabled: true
   postgresql:
-    enabled: false
+    enabled: true
     host: ~
     port: 5432
     auth:
