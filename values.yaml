@@ -10,22 +10,24 @@ postgresql-interval:
     password: "Training@2022"
   primary:
     initdb:
+      user: postgres
+      password: Root@2022
       scripts:
         db_init.sql: |
           CREATE DATABASE airflow;
-          CREATE USER airflow WITH ENCRYPTED PASSWORD 'Airflow@2022' LOGIN;
+          CREATE ROLE airflow WITH ENCRYPTED PASSWORD 'Airflow@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
           
           CREATE DATABASE metastore;
-          CREATE USER hive WITH ENCRYPTED PASSWORD 'Hive@2022' LOGIN;
+          CREATE ROLE hive WITH ENCRYPTED PASSWORD 'Hive@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE metastore TO hive;
           
           CREATE DATABASE hue;
-          CREATE USER hue WITH ENCRYPTED PASSWORD 'Hue@2022' LOGIN;
+          CREATE ROLE hue WITH ENCRYPTED PASSWORD 'Hue@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE hue TO hue;
           
           CREATE DATABASE superset;
-          CREATE USER superset WITH ENCRYPTED PASSWORD 'Superset@2022' LOGIN;
+          CREATE ROLE superset WITH ENCRYPTED PASSWORD 'Superset@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
           
           flush privileges;
@@ -232,6 +234,9 @@ hue:
   enabled: true
   postgresql:
     enabled: false
+    host: '{{ template "platform.postgresql-interval" . }}'
+    auth:
+      password: "Hue@2022"
   hue:
     replicas: 1
     ini: |

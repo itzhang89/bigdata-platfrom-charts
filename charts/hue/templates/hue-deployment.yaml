@@ -39,7 +39,7 @@ spec:
             - -c
             - >
               set -x;
-              while [ $(curl -s --connect-timeout 1 {{ .Values.postgresql.host | default (printf "%s-postgres" (include "hue.fullname" .)) }}:{{ .Values.postgresql.port }} || echo $?) -ne 52 ]; do
+              while [ $(curl -s --connect-timeout 1 {{ tpl .Values.postgresql.host . | default (printf "%s-postgres" (include "hue.fullname" .)) }}:{{ .Values.postgresql.port }} || echo $?) -ne 52 ]; do
                 sleep 1;
               done
       containers:

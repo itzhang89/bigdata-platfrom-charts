@@ -8,7 +8,7 @@ data:
 
     [[database]]
     engine=postgresql_psycopg2
-    host={{ .Values.postgresql.host | default (printf "%s-postgres" (include "hue.fullname" .)) }}
+    host={{ tpl .Values.postgresql.host . | default (printf "%s-postgres" (include "hue.fullname" .)) }}
     port={{ .Values.postgresql.port }}
     user={{ .Values.postgresql.auth.user }}
 {{- if .Values.postgresql.auth.password_script }}
@@ -30,7 +30,7 @@ data:
     [[[postgresql]]]
     name = postgresql
     interface=sqlalchemy
-    options='{"url": "postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ .Values.postgresql.host | default (printf "%s-postgres" (include "hue.fullname" .)) }}:{{ .Values.postgresql.port }}/{{ .Values.postgresql.auth.database }}"}'
+    options='{"url": "postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ tpl .Values.postgresql.host . | default (printf "%s-postgres" (include "hue.fullname" .)) }}:{{ .Values.postgresql.port }}/{{ .Values.postgresql.auth.database }}"}'
     {{- if .Values.hue.interpreters }}
     {{ .Values.hue.interpreters | indent 4 }}
     {{- end }}

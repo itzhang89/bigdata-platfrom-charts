@@ -36,3 +36,16 @@ app.kubernetes.io/instance: {{ .Release.Name | quote }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/part-of: {{ .Chart.Name }}
 {{- end -}}
+
+{{- define "hive.hive-metastore" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 54 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default "hive-metastore" .Values.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 54 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 54 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
