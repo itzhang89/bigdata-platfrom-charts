@@ -16,7 +16,7 @@ data:
 {{- else }}
     password={{ .Values.postgresql.auth.password }}
 {{- end }}
-    name={{ .Values.postgresql.name }}
+    name={{ .Values.postgresql.auth.database }}
 
     [aws]
     [[aws_accounts]]
