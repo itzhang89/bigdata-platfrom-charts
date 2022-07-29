@@ -69,3 +69,6 @@ dependencies:
   - name: hbase
     version: ~0.1.6
     condition: hbase.enabled
+  - name: hive-metastore
+    version: ~0.1.4
+    condition: hive-metastore.enabled
