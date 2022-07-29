@@ -116,11 +116,11 @@ hdfs:
       httpfs.proxyuser.hue.groups: "*"
 hive:
   enabled: true
-  metastore:
+  hive-metastore:
     enabled: true
     postgresql:
       enabled: false
-      host: '{{ template "postgresql.primary.fullname" . }}-postgresql'
+      host: '{{ template "platform.postgresql-interval" . }}'
       port: 5432
       auth:
         database: "metastore"
