@@ -4,8 +4,7 @@ dependencies:
   - alias: metastore
     condition: metastore.enabled
     name: hive-metastore
-    repository: https://yutianaiqingtian.github.io/bigdata-charts
-    version: ~0.1.4
+    version: ~0.1.5
   - condition: hdfs.enabled
     name: hdfs
     repository: https://yutianaiqingtian.github.io/bigdata-charts
@@ -24,4 +23,4 @@ sources:
   - https://github.com/apache/hive
   - https://github.com/big-data-europe/docker-hive
   - https://github.com/yutianaiqingtian/bigdata-charts
-version: 0.1.7
+version: 0.1.8

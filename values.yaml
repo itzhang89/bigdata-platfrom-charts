@@ -354,5 +354,3 @@ kafka-connect-ui:
   enabled: false
 opentsdb:
   enabled: false
-hive-metastore:
-  enabled: false
