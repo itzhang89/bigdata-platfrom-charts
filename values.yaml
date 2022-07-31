@@ -297,8 +297,8 @@ hue:
       [hadoop]
       [[hdfs_clusters]]
       [[[default]]]
-      fs_defaultfs=hdfs://my-hdfs.bigdata.svc.cluster.local:9820
-      webhdfs_url=http://my-hdfs-httpfs.bigdata.svc.cluster.local:14000/webhdfs/v1
+      fs_defaultfs=hdfs://{{ template "platform.hdfs" . }}:9820
+      webhdfs_url=http://{{ template "platform.hdfs" . }}-httpfs:14000/webhdfs/v1
   aws:
     accessKeyId: ""
     secretAccessKey: ""
@@ -348,7 +348,7 @@ superset:
       AUTH_USER_REGISTRATION_ROLE = "admin"
 
       # When using LDAP Auth, setup the ldap server
-      AUTH_LDAP_SERVER = "ldap://{{ template "platform.openldap" . }}:389"
+      AUTH_LDAP_SERVER = 'ldap://{{ template "platform.openldap" . }}:389'
       AUTH_LDAP_SEARCH = "ou=databu,dc=demo,dc=com"
       AUTH_LDAP_UID_FIELD = "cn"
 

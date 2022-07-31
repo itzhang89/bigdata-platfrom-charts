@@ -35,7 +35,6 @@ dependencies:
     condition: openldap.enabled
   - name: hdfs
     version: ~1.0.1
-    repository: https://mehrwertmacher.github.io/bigdata-charts
     condition: hdfs.enabled
   - name: hive
     version: ~0.1.8
