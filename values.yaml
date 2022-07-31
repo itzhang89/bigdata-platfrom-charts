@@ -31,6 +31,8 @@ postgresql-interval:
           GRANT ALL PRIVILEGES ON DATABASE superset TO superset;
           
           flush privileges;
+redis:
+  enabled: true
 openldap:
   enabled: true
   adminPassword: Root@2022
@@ -138,10 +140,6 @@ spark:
 airflow:
   enabled: false
   # Secrets for all airflow containers
-  secret:
-    - envName: "AIRFLOW_CONN_S3"
-      secretName: "my-airflow-s3-connections"
-      secretKey: "AIRFLOW_CONN_S3"
 
   # Default airflow repository -- overrides all the specific images below
   defaultAirflowRepository: 5200710/airflow
@@ -150,7 +148,8 @@ airflow:
   # Airflow version (Used to make some decisions based on Airflow Version being deployed)
   airflowVersion: "2.3.0"
 
-  # Not recommended for production
+  redis:
+    enabled: false
   postgresql:
     enabled: false
     host: '{{ template "platform.postgresql-interval" . }}'
@@ -168,6 +167,7 @@ airflow:
       pass: Airflow@2022
       db: airflow
       sslmode: disable
+    brokerUrl: redis://:7BydCk4J91@my-airflow-redis:6379/0
 
   # Airflow webserver settings
   webserver:
@@ -307,11 +307,14 @@ superset:
   enabled: true
   postgresql:
     enabled: false
+  redis:
+    enabled: false
   init:
     adminUser:
       password: Root@2022
   supersetNode:
     connections:
+      redis_host: '{{ template "platform.fullname" . }}-redis-headless'
       # You need to change below configuration incase bringing own PostgresSQL instance and also set postgresql.enabled:false
       db_host: '{{ template "platform.postgresql-interval" . }}'
       db_pass: Superset@2022
