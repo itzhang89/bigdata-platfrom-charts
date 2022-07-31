@@ -33,6 +33,11 @@ postgresql-interval:
           flush privileges;
 redis:
   enabled: true
+  architecture: standalone
+  auth:
+    ## Enable password authentication
+    enabled: false
+
 openldap:
   enabled: true
   adminPassword: Root@2022
@@ -40,7 +45,8 @@ openldap:
   env:
     LDAP_ORGANISATION: "Training Inc."
     LDAP_DOMAIN: "demo.com"
-    LDAP_TLS_VERIFY_CLIENT: "try"
+    LDAP_TLS: "false"
+    LDAP_TLS_VERIFY_CLIENT: "nerver"
   customLdifFiles:
     01-default-users.ldif: |-
       # Entry 2: ou=databu,dc=demo,dc=com
@@ -48,13 +54,6 @@ openldap:
       objectclass: organizationalUnit
       objectclass: top
       ou: databu
-      # Entry 3: cn=Admin,ou=databu,dc=demo,dc=com
-      dn: cn=Admin,ou=databu,dc=demo,dc=com
-      cn: Admin
-      gidnumber: 501
-      memberuid: zjh
-      objectclass: posixGroup
-      objectclass: top
       
       # Entry 3: cn=yhj,ou=databu,dc=demo,dc=com
       dn: cn=yhj,ou=databu,dc=demo,dc=com
