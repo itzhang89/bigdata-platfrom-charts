@@ -44,10 +44,10 @@ dependencies:
     version: ~6.1.5
     repository: https://charts.bitnami.com/bitnami
     condition: spark.enabled
-#  - name: airflow
-#    version: ~1.6.0
-#    repository: https://airflow.apache.org
-#    condition: airflow.enabled
+  - name: airflow
+    version: ~1.6.0
+    repository: https://airflow.apache.org
+    condition: airflow.enabled
   - name: hue
     version: ~1.0.3
     condition: hue.enabled

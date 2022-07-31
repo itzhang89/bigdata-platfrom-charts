@@ -4,4 +4,4 @@ metadata:
   name: {{ include "hue.fullname" . }}-extra-config
 data:
   zz-hue-ini: |
-    {{ .Values.hue.ini | indent 4 | trim }}
+    {{ tpl .Values.hue.zz_hue_ini . | indent 4 | trim }}

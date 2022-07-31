@@ -21,7 +21,7 @@ hue:
 #    name = postgresql
 #    interface=sqlalchemy
 #    options='{"url": "postgresql://hue:hue@my-hue-postgres:5432/hue"}'
-  ini: |
+  zz_hue_ini: |
     [desktop]
     secret_key=hue123
     app_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie

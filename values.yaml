@@ -136,7 +136,7 @@ spark:
   enabled: true
 
 airflow:
-  enabled: true
+  enabled: false
   # Secrets for all airflow containers
   secret:
     - envName: "AIRFLOW_CONN_S3"
@@ -152,17 +152,21 @@ airflow:
 
   # Not recommended for production
   postgresql:
-    enabled: true
-    postgresqlPassword: Root@2022
-    postgresqlUsername: postgres
+    enabled: false
+    host: '{{ template "platform.postgresql-interval" . }}'
+    port: 5432
+    auth:
+      database: "airflow"
+      username: "airflow"
+      password: "Airflow@2022"
 
   # Airflow database & redis config
   data:
     # Otherwise, pass connection values in
     metadataConnection:
-      user: postgres
-      pass: Root@2022
-      db: postgres
+      user: airflow
+      pass: Airflow@2022
+      db: airflow
       sslmode: disable
 
   # Airflow webserver settings
@@ -181,7 +185,7 @@ airflow:
       from flask_appbuilder.security.manager import AUTH_LDAP
 
       AUTH_TYPE = AUTH_LDAP
-      AUTH_LDAP_SERVER = "ldap://10.204.202.50:389"
+      AUTH_LDAP_SERVER = 'ldap://{{ template "platform.openldap" . }}:389'
       AUTH_LDAP_USE_TLS = False
 
       # searches
@@ -239,7 +243,7 @@ hue:
       password: "Hue@2022"
   hue:
     replicas: 1
-    ini: |
+    zz_hue_ini: |
       [desktop]
       secret_key=hue123
       app_blacklist=spark,zookeeper,hbase,impala,search,pig,sqoop,security
@@ -258,7 +262,7 @@ hue:
       backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
 
       [[ldap]]
-      ldap_url=ldap://10.204.202.50:389
+      ldap_url=ldap://{{ template "platform.openldap" . }}:389
       search_bind_authentication=true
       use_start_tls=false
       create_users_on_login=true
@@ -344,7 +348,7 @@ superset:
       AUTH_USER_REGISTRATION_ROLE = "admin"
 
       # When using LDAP Auth, setup the ldap server
-      AUTH_LDAP_SERVER = "ldap://10.204.202.50:389"
+      AUTH_LDAP_SERVER = "ldap://{{ template "platform.openldap" . }}:389"
       AUTH_LDAP_SEARCH = "ou=databu,dc=demo,dc=com"
       AUTH_LDAP_UID_FIELD = "cn"
 
