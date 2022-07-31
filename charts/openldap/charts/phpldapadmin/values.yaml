@@ -1,5 +1,6 @@
 # Default values for phpldapadmin. If not set up the  PHPLDAPADMIN_LDAP_HOSTS value, I would be setup to {{ .Release.Name }} name.
 env:
+  # if not set the PHPLDAPADMIN_LDAP_HOSTS , default is {{ .Release.Name }}-openldap, otherwise is {{ tpl .Values.env "PHPLDAPADMIN_LDAP_HOSTS" }}
   PHPLDAPADMIN_HTTPS: false
   PHPLDAPADMIN_TRUST_PROXY_SSL: true
 

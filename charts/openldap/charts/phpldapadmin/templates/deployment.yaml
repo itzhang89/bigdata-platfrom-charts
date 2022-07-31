@@ -28,9 +28,11 @@ spec:
           containerPort: 80
           protocol: TCP
         env:
-        {{- if not (index .Values.env "PHPLDAPADMIN_LDAP_HOSTS" ) }}
         - name: PHPLDAPADMIN_LDAP_HOSTS
-          value: {{ .Release.Name }}
+        {{- if not (index .Values.env "PHPLDAPADMIN_LDAP_HOSTS" ) }}
+          value: {{ .Release.Name }}-openldap
+        {{- else -}}
+          value: {{ tpl .Values.env "PHPLDAPADMIN_LDAP_HOSTS" }}
         {{- end }}
         {{- range $key, $value := .Values.env }}
         - name: {{ $key }}
