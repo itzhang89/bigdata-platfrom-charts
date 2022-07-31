@@ -2,7 +2,7 @@
 {{- $fullname := include "hdfs.fullname" . -}}
 {{- $ingressPath := .Values.ingress.nameNode.path -}}
 {{- $httpPort := .Values.nameNode.httpPort -}}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullname }}-namenode
@@ -24,8 +24,11 @@ spec:
       http:
         paths:
           - path: {{ $ingressPath }}
+            pathType: ImplementationSpecific
             backend:
-              serviceName: {{ $fullname }}-namenode
-              servicePort: {{ $httpPort }}
+              service:
+                name: {{ $fullname }}-namenode
+                port:
+                  number: {{ $httpPort }}
   {{- end }}
 {{- end }}

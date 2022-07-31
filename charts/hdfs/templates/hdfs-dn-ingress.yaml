@@ -2,7 +2,7 @@
 {{- $fullname := include "hdfs.fullname" . -}}
 {{- $ingressPath := .Values.ingress.dataNode.path -}}
 {{- $httpPort := .Values.dataNode.httpPort -}}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullname }}-datanode
@@ -17,15 +17,18 @@ metadata:
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
-spec: 
+spec:
   rules:
   {{- range .Values.ingress.dataNode.hosts }}
     - host: {{ . }}
       http:
         paths:
           - path: {{ $ingressPath }}
+            pathType: ImplementationSpecific
             backend:
-              serviceName: {{ $fullname }}-datanode
-              servicePort: {{ $httpPort }}
+              service:
+                name: {{ $fullname }}-datanode
+                port:
+                  number: {{ $httpPort }}
   {{- end }}
 {{- end }}
