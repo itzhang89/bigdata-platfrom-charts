@@ -113,21 +113,6 @@ nodeSelector: { }
 
 tolerations: [ ]
 
-
-## test container details
-test:
-  enabled: false
-  image:
-    repository: dduportal/bats
-    tag: 0.4.0
-ltb-passwd:
-  enabled: false
-  ldap:
-    server: ldap://openldap
-    searchBase: dc=example,dc=org
-    bindDN: cn=admin,dc=example,dc=org
-    bindPWKey: LDAP_ADMIN_PASSWORD
-
 phpldapadmin:
   enabled: true
   env: { }

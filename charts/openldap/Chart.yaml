@@ -1,9 +1,6 @@
 apiVersion: v2
 appVersion: 2.4.47
 dependencies:
-  - condition: ltb-passwd.enabled
-    name: ltb-passwd
-    version: ~0.1.0
   - condition: phpldapadmin.enabled
     name: phpldapadmin
     version: ~0.1.2
