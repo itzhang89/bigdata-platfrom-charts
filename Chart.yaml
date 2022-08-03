@@ -24,6 +24,9 @@ version: 0.1.0
 appVersion: "0.1.0"
 
 dependencies:
+  - name: common
+    version: ~1.16.0
+    repository: https://charts.bitnami.com/bitnami
   - name: postgresql
     alias: postgresql-interval
     version: ~11.6.0
