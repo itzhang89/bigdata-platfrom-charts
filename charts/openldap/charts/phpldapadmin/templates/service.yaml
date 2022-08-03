@@ -1,31 +1,20 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "phpldapadmin.fullname" . }}
-  labels:
-    app.kubernetes.io/name: {{ include "phpldapadmin.name" . }}
-    app.kubernetes.io/component: phpldapadmin
-    {{- include "phpldapadmin.labels" . | nindent 4 }}
-{{- if .Values.service.annotations }}
-  annotations:
-{{ toYaml .Values.service.annotations | indent 4 }}
-{{- end }}
+  name: {{ printf "%s" (include "common.names.fullname" .) }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
 spec:
-  type: {{ .Values.service.type }}
-  {{- if and .Values.service.loadBalancerIP (eq .Values.service.type "LoadBalancer") }}
-  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
-  {{- end }}
-  {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerSourceRanges }}
-  loadBalancerSourceRanges:
-  {{ with .Values.service.loadBalancerSourceRanges }}
-{{ toYaml . | indent 4 }}
-{{- end }}
-  {{- end }}
+  type: ClusterIP
   ports:
-  - port: {{ .Values.service.port }}
-    targetPort: http
-    protocol: TCP
-    name: http
-  selector:
-    app: {{ template "phpldapadmin.name" . }}
-    release: {{ .Release.Name }}
+    - port: {{ .Values.service.ports.http }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
