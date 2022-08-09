@@ -101,6 +101,10 @@ openldap:
       uidnumber: 1000
       userpassword: {MD5}lOjN5GErP9OQZ31C57IgAg==
 
+  phpldapadmin:
+    ingress:
+      enabled: true
+      hostname: phpldapadmin.demo.com
 hdfs:
   enabled: true
   conf:
@@ -135,6 +139,9 @@ hive:
       hive.metastore.schema.verification: false
 spark:
   enabled: true
+  ingress:
+    enabled: true
+    hostname: spark.demo.com
 
 airflow:
   enabled: false
@@ -234,6 +241,10 @@ airflow:
       colored_console_log: 'True'
 
 hue:
+  ingress:
+    enabled: true
+    hosts:
+      - hue.demo.com
   enabled: true
   postgresql:
     enabled: false
@@ -303,6 +314,10 @@ hue:
     secretAccessKey: ""
     awsRegion: "us-east-1"
 superset:
+  ingress:
+    enabled: true
+    hosts:
+      - superset.demo.com
   enabled: true
   postgresql:
     enabled: false
