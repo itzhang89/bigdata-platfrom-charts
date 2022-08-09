@@ -3,6 +3,31 @@ image:
   tag: 4.10.0
   pullPolicy: IfNotPresent
 
+service:
+  type: NodePort
+  port: 80
+  annotations: {}
+    # cloud.google.com/load-balancer-type: "Internal"
+  loadBalancerIP: null
+
+ingress:
+  enabled: false
+  # ingressClassName: nginx
+  annotations: {}
+    # kubernetes.io/tls-acme: "true"
+    ## Extend timeout to allow long running queries.
+    # nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    # nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    # nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  path: /
+  pathType: ImplementationSpecific
+  hosts:
+    - hue.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
 postgresql:
   name: postgresql
   enabled: true

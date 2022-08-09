@@ -6,6 +6,6 @@ To check the status of your installation run:
 
 Get the recommended URL below and start executing queries:
 
-echo http://{{ include "hue.fullname" . }}-svc:8888
+echo http://{{ include "hue.fullname" . }}:{{ .Values.service.port }}
 
 Happy Querying!
