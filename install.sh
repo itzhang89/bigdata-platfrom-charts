@@ -11,4 +11,8 @@ variables="releaseName=$releaseName"
 templ=$(cat ./values.yaml.template)
 printf "$variables\ncat << EOF\n$templ\nEOF" | bash >./values.yaml
 
-helm install $releaseName . --debug
+if [ -f ./overwrite-values.yaml ]; then
+  helm upgrade --install $releaseName . --debug -f ./overwrite-values.yaml
+else
+  helm upgrade --install $releaseName . --debug
+fi

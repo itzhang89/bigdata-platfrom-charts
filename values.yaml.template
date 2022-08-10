@@ -121,6 +121,11 @@ hdfs:
     httpfsSite:
       httpfs.proxyuser.hue.hosts: "*"
       httpfs.proxyuser.hue.groups: "*"
+  ingress:
+    nameNode:
+      enabled: true
+      hosts:
+        - hdfs.demo.com
 hive:
   enabled: true
   hive-metastore:
