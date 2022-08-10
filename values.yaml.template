@@ -229,6 +229,11 @@ hue:
       password: "Hue@2022"
   hue:
     replicas: 1
+    interpreters: |-
+      [[[postgresql]]]
+      name = postgresql
+      interface=sqlalchemy
+      options='{"url": "postgresql://training:Training@2022@$releaseName-postgresql-interval:5432/training"}'
     zz_hue_ini: |
       [desktop]
       secret_key=hue123

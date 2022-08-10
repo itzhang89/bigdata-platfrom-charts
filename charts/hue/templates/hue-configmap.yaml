@@ -27,10 +27,6 @@ data:
 
     [notebook]
     [[interpreters]]
-    [[[postgresql]]]
-    name = postgresql
-    interface=sqlalchemy
-    options='{"url": "postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ tpl .Values.postgresql.host . | default (printf "%s-postgres" (include "hue.fullname" .)) }}:{{ .Values.postgresql.port }}/{{ .Values.postgresql.auth.database }}"}'
     {{- if .Values.hue.interpreters }}
     {{ .Values.hue.interpreters | indent 4 }}
     {{- end }}
