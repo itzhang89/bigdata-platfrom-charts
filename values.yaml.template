@@ -135,7 +135,7 @@ hive:
         password: "Hive@2022"
   conf:
     hiveSite:
-      hive.metastore.warehouse.dir: hdfs://my-hdfs.bigdata.svc.cluster.local:9820/user/hive/warehouse
+      hive.metastore.warehouse.dir: hdfs://$releaseName-hdfs-namenode:9820/user/hive/warehouse
       hive.metastore.schema.verification: false
 spark:
   enabled: true
@@ -157,7 +157,7 @@ airflow:
         from flask_appbuilder.security.manager import AUTH_LDAP
 
         AUTH_TYPE = AUTH_LDAP
-        AUTH_LDAP_SERVER = "ldap://my-platform-openldap:389"
+        AUTH_LDAP_SERVER = "ldap://$releaseName-openldap:389"
         AUTH_LDAP_USE_TLS = False
 
         # registration configs
@@ -197,12 +197,12 @@ airflow:
   postgresql:
     enabled: false
   externalDatabase:
-    host: my-platform-postgresql-interval
+    host: $releaseName-postgresql-interval
     password: "Airflow@2022"
   redis:
     enabled: false
   externalRedis:
-    host: my-platform-redis-master
+    host: $releaseName-redis-master
     port: 6379
   ingress:
     enabled: true
@@ -264,7 +264,7 @@ hue:
 
       [beeswax]
       # Host where HiveServer2 is running.
-      hive_server_host=my-hive-server
+      hive_server_host=$releaseName-hive-server
       # Port where HiveServer2 Thrift server runs on.
       hive_server_port=10000
       thrift_version=7
