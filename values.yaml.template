@@ -221,6 +221,8 @@ hue:
     enabled: true
     hosts:
       - hue.demo.com
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 2048m
   enabled: true
   postgresql:
     enabled: false
