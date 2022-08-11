@@ -73,3 +73,6 @@ dependencies:
   - name: hbase
     version: ~0.1.6
     condition: hbase.enabled
+  - name: dolphinscheduler
+    version: ~2.0.0
+    condition: dolphinscheduler.enabled

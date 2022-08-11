@@ -363,3 +363,5 @@ kafka-connect-ui:
   enabled: false
 opentsdb:
   enabled: false
+dolphinscheduler:
+  enabled: false
