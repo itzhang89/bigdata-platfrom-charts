@@ -44,20 +44,20 @@ spec:
                   app.kubernetes.io/component: namenode
                   {{- include "hdfs.labels" . | nindent 18 }}
         {{- end }}
-      initContainers:
-      - name: "chown"
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-        command:
-        - /bin/bash
-        - -c
-        - chown -R hdfs:hadoop /dfs &&
-          chmod g+s /dfs
-        securityContext:
-          runAsUser: 0
-        volumeMounts:
-        - mountPath: /dfs
-          name: dfs
+#      initContainers:
+#      - name: "chown"
+#        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+#        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+#        command:
+#        - /bin/bash
+#        - -c
+#        - chown -R hdfs:hadoop /data/dfs &&
+#          chmod g+s /data/dfs
+#        securityContext:
+#          runAsUser: 0
+#        volumeMounts:
+#        - mountPath: /data/dfs
+#          name: dfs
       containers:
       - name: namenode
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -85,7 +85,7 @@ spec:
         - name: hadoop-config
           mountPath: /tmp/hadoop-config
         - name: dfs
-          mountPath: /dfs
+          mountPath: /data/dfs
       {{- if .Values.prometheus.exporter.enabled }}
       - name: namenode-exporter
         image: "{{ .Values.prometheus.exporter.image }}"
@@ -103,7 +103,7 @@ spec:
         - name: config-exporter
           mountPath: /exporter
         - name: dfs
-          mountPath: /dfs
+          mountPath: /data/dfs
       {{- end }}
       volumes:
       - name: hadoop-config

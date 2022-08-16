@@ -1,13 +1,14 @@
 # The base hadoop image to use for all components.
 # See this repo for image build details: https://github.com/Comcast/kube-yarn/tree/master/image
 image:
-  repository: gradiant/hdfs
-  tag: 3.2.2
+  repository: 5200710/hadoop
+  tag: 3.2.3
   pullPolicy: IfNotPresent
 
 # Select antiAffinity as either hard or soft, default is 'soft'
 # 'hard' is sugested for production setup
 antiAffinity: "soft"
+logLevel: INFO
 
 conf:
   coreSite:
@@ -47,6 +48,19 @@ dataNode:
     limits:
       memory: "2048Mi"
       cpu: "1000m"
+
+resourcemanager:
+  port: 8088
+  httpPort: 80
+  httpsPort: 443
+  pdbMinAvailable: 1
+
+nodemanager:
+  port: 8088
+  httpPort: 8042
+  httpsPort: 443
+  pdbMinAvailable: 1
+
 
 ingress:
   nameNode:

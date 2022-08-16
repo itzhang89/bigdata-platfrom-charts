@@ -8,7 +8,7 @@ metadata:
     {{- include "hdfs.labels" . | nindent 4 }}
 data:
   config-exporter.yml: |-
-    fsImagePath : '/dfs/name/current'
+    fsImagePath : '/data/dfs/name/current'
     skipPreviouslyParsed : true
     skipFileDistributionForGroupStats : false
     skipFileDistributionForUserStats : false

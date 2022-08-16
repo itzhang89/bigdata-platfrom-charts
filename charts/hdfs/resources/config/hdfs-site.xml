@@ -3,13 +3,13 @@
 <configuration>
     <property><name>dfs.datanode.use.datanode.hostname</name><value>false</value></property>
     <property><name>dfs.client.use.datanode.hostname</name><value>false</value></property>
-    <property><name>dfs.datanode.data.dir</name><value>file:///dfs/data</value>
+    <property><name>dfs.datanode.data.dir</name><value>file:///data/dfs/data</value>
     <description>DataNode directory</description>
     </property>
 
     <property>
     <name>dfs.namenode.name.dir</name>
-    <value>file:///dfs/name</value>
+    <value>file:///data/dfs/name</value>
     <description>NameNode directory for namespace and transaction logs storage.</description>
     </property>
 
