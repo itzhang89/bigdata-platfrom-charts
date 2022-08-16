@@ -9,7 +9,6 @@ metadata:
 data:
   config-exporter.yml: |-
     fsImagePath : '/data/dfs/name/current'
-    skipPreviouslyParsed : true
     skipFileDistributionForGroupStats : false
     skipFileDistributionForUserStats : false
     skipFileDistributionForPathStats : false

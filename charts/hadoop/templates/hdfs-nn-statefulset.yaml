@@ -88,7 +88,8 @@ spec:
           mountPath: /data/dfs
       {{- if .Values.prometheus.exporter.enabled }}
       - name: namenode-exporter
-        image: "{{ .Values.prometheus.exporter.image }}"
+        image: "{{ .Values.prometheus.exporter.image.repository }}:{{ .Values.prometheus.exporter.image.tag }}"
+        imagePullPolicy: {{ .Values.prometheus.exporter.image.pullPolicy | quote }}
         command:
         - /bin/sh
         - -c

@@ -12,10 +12,13 @@ logLevel: INFO
 
 conf:
   coreSite:
-    # fs.trash.interval: "10080"  # trash auto purge in minutes
+  # fs.trash.interval: "10080"  # trash auto purge in minutes
   hdfsSite:
     dfs.replication: 3  # when changing this value ensure that dataNode.replicas is equal or higher than this value
     # dfs.datanode.du.reserved: "4294967296"  # number of bytes to reserve on disk to block hitting disk full, must be quoted for large numbers, because of gotemplate converting large numbers to float with scientific notation
+  httpfsSite: { }
+  yarnSite: { }
+  mapredSite: { }
 
 # httpsfs service
 httpfs:
@@ -50,12 +53,14 @@ dataNode:
       cpu: "1000m"
 
 resourcemanager:
+  replicas: 1
   port: 8088
   httpPort: 80
   httpsPort: 443
   pdbMinAvailable: 1
 
 nodemanager:
+  replicas: 1
   port: 8088
   httpPort: 8042
   httpsPort: 443
@@ -116,6 +121,9 @@ prometheus:
   ## Exporter Configuration
   ## ref: https://github.com/marcelmay/hadoop-hdfs-fsimage-exporter
   exporter:
+    image:
+      repository: marcelmay/hadoop-hdfs-fsimage-exporter
+      tag: 1.3
+      pullPolicy: IfNotPresent
     enabled: true
-    image: marcelmay/hadoop-hdfs-fsimage-exporter:1.2
     port: 5556
