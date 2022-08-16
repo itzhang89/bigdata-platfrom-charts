@@ -40,7 +40,7 @@ dependencies:
     version: ~2.0.4
 #    repository: https://yutianaiqingtian.github.io/bigdata-charts
     condition: openldap.enabled
-  - name: hdfs
+  - name: hadoop
     version: ~1.0.1
     condition: hdfs.enabled
   - name: hive

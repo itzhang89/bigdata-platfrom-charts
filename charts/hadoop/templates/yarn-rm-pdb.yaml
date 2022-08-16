@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "hadoop.fullname" . }}-resourcemanager
+  labels:
+    app.kubernetes.io/name: {{ include "hadoop.name" . }}
+    app.kubernetes.io/component: resourcemanager
+    {{- include "hadoop.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "hadoop.name" . }}
+      app.kubernetes.io/component: resourcemanager
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  minAvailable: {{ .Values.resourcemanager.pdbMinAvailable }}

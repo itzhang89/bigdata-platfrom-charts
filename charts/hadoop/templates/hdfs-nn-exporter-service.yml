@@ -1,0 +1,19 @@
+{{- if .Values.prometheus.exporter.enabled }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ include "hadoop.fullname" . }}-namenode-exporter
+  labels:
+    app.kubernetes.io/name: {{ include "hadoop.name" . }}
+    app.kubernetes.io/component: namenode
+    {{- include "hadoop.labels" . | nindent 4 }}
+spec: 
+  selector:
+    app.kubernetes.io/name: {{ include "hadoop.name" . }}
+    app.kubernetes.io/component: namenode
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+  - port: {{ .Values.prometheus.exporter.port }}
+    name: metrics
+    targetPort: {{ .Values.prometheus.exporter.port }}
+{{- end }}

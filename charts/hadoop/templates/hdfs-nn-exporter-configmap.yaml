@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "hadoop.fullname" . }}-namenode-exporter
+  labels:
+    app.kubernetes.io/name: {{ include "hadoop.name" . }}
+    app.kubernetes.io/component: namenode
+    {{- include "hadoop.labels" . | nindent 4 }}
+data:
+  config-exporter.yml: |-
+    fsImagePath : '/data/dfs/name/current'
+    skipPreviouslyParsed : true
+    skipFileDistributionForGroupStats : false
+    skipFileDistributionForUserStats : false
+    skipFileDistributionForPathStats : false
+    skipFileDistributionForPathSetStats : false
+    fileSizeDistributionBuckets: ['0','1MiB', '32MiB', '64MiB', '128MiB', '1GiB', '10GiB']
+
+
