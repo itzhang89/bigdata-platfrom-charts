@@ -3,7 +3,7 @@
 <configuration>
     <property>
         <name>yarn.resourcemanager.hostname</name>
-        <value>{{ include "hadoop.fullname" . }}-resourcemanager</value>
+        <value>{{ include "hadoop.fullname" . }}-resourcemanager-hl</value>
     </property>
     <!-- Bind to all interfaces -->
     <property>
@@ -45,6 +45,11 @@
         <description>Where to aggregate logs to.</description>
         <name>yarn.nodemanager.remote-app-log-dir</name>
         <value>/var/log/hadoop-yarn/apps</value>
+    </property>
+    <property>
+        <description>The address for the web proxy as HOST:PORT, if this is not given then the proxy will run as part of the RM.</description>
+        <name>yarn.web-proxy.address</name>
+        <value>1080</value>
     </property>
     <property>
         <name>yarn.application.classpath</name>

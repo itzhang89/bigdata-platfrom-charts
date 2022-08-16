@@ -68,7 +68,7 @@ if [[ $2 == "nodemanager" ]]; then
 EOM
   echo '</configuration>' >> $HADOOP_HOME/etc/hadoop/yarn-site.xml
   # Wait with timeout for resourcemanager
-  TMP_URL="http://{{ include "hadoop.fullname" . }}-resourcemanager:8088/ws/v1/cluster/info"
+  TMP_URL="http://{{ include "hadoop.fullname" . }}-resourcemanager-hl:8088/ws/v1/cluster/info"
   if timeout 5m bash -c "until curl -sf $TMP_URL; do echo Waiting for $TMP_URL; sleep 5; done"; then
     $HADOOP_HOME/bin/yarn nodemanager --loglevel {{ .Values.logLevel }}
   else

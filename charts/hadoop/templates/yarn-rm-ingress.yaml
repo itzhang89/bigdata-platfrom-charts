@@ -14,27 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{ if .Values.ingress.yarn.enabled -}}
+{{ if .Values.ingress.resourcemanager.enabled -}}
 {{- $fullName := include "hadoop.fullname" . -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $fullName }}-yarn-ui-ingress
+  name: {{ $fullName }}-resourcemanager-ingress
   labels:
     app.kubernetes.io/name: {{ include "hadoop.name" . }}
     app.kubernetes.io/component: resourcemanager
     {{- include "hadoop.labels" . | nindent 4 }}
-{{- with .Values.ingress.yarn.annotations }}
+{{- with .Values.ingress.resourcemanager.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
-{{- if .Values.ingress.yarn.ingressClassName }}
-  ingressClassName: {{ .Values.ingress.yarn.ingressClassName }}
+{{- if .Values.ingress.resourcemanager.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.resourcemanager.ingressClassName }}
 {{- end }}
-{{- if .Values.ingress.yarn.tls }}
+{{- if .Values.ingress.resourcemanager.tls }}
   tls:
-  {{- range .Values.ingress.yarn.tls }}
+  {{- range .Values.ingress.resourcemanager.tls }}
     - hosts:
       {{- range .hosts }}
         - {{ . }}
@@ -43,15 +43,15 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.ingress.yarn.hosts }}
+  {{- range .Values.ingress.resourcemanager.hosts }}
     - host: {{ . }}
       http:
         paths:
-          - path: {{ $.Values.ingress.yarn.path }}
-            pathType: {{ $.Values.ingress.yarn.pathType }}
+          - path: {{ $.Values.ingress.resourcemanager.path }}
+            pathType: {{ $.Values.ingress.resourcemanager.pathType }}
             backend:
               service:
-                name: {{ $fullName }}-yarn-webui
+                name: {{ $fullName }}-resourcemanager
                 port:
                   name: http
   {{- end }}

@@ -6,12 +6,21 @@ metadata:
     app.kubernetes.io/name: {{ include "hadoop.name" . }}
     app.kubernetes.io/component: resourcemanager
     {{- include "hadoop.labels" . | nindent 4 }}
+{{- with .Values.resourcemanager.service.annotations }}
+  annotations:
+{{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
+  type: {{ .Values.resourcemanager.service.type }}
   ports:
-  - port: 8088
-    name: http
-  clusterIP: None
+    - port: {{ .Values.resourcemanager.service.port }}
+      protocol: TCP
+      targetPort: 8088
+      name: http
   selector:
     app.kubernetes.io/name: {{ include "hadoop.name" . }}
     app.kubernetes.io/component: resourcemanager
     app.kubernetes.io/instance: {{ .Release.Name }}
+  {{- if .Values.resourcemanager.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.resourcemanager.service.loadBalancerIP }}
+  {{- end }}

@@ -58,6 +58,12 @@ resourcemanager:
   httpPort: 80
   httpsPort: 443
   pdbMinAvailable: 1
+  service:
+    type: ClusterIP
+    port: 80
+    annotations: { }
+    # cloud.google.com/load-balancer-type: "Internal"
+    loadBalancerIP: null
 
 nodemanager:
   replicas: 1
@@ -65,14 +71,6 @@ nodemanager:
   httpPort: 8042
   httpsPort: 443
   pdbMinAvailable: 1
-
-yarn:
-  service:
-    type: NodePort
-    port: 80
-    annotations: { }
-    # cloud.google.com/load-balancer-type: "Internal"
-    loadBalancerIP: null
 
 ingress:
   nameNode:
@@ -105,8 +103,8 @@ ingress:
     path: /
     hosts:
       - "httpfs.local"
-  yarn:
-    enabled: true
+  resourcemanager:
+    enabled: false
     # ingressClassName: nginx
     annotations: {
       # kubernetes.io/tls-acme: "true"

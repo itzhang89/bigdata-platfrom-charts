@@ -10,20 +10,20 @@
 
    Then open the yarn web ui in your browser:
 
-    {{- if .Values.ingress.yarn.enabled }}
-    {{- range .Values.ingress.yarn.hosts }}
-      http{{ if $.Values.ingress.yarn.tls }}s{{ end }}://{{ . }}{{ $.Values.ingress.yarn.path }}
+    {{- if .Values.ingress.resourcemanager.enabled }}
+    {{- range .Values.ingress.resourcemanager.hosts }}
+      http{{ if $.Values.ingress.resourcemanager.tls }}s{{ end }}://{{ . }}{{ $.Values.ingress.resourcemanager.path }}
     {{- end }}
-    {{- else if contains "NodePort" .Values.yarn.service.type }}
-      export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "hadoop.fullname" . }}-yarn-webui
+    {{- else if contains "NodePort" .Values.resourcemanager.service.type }}
+      export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "hadoop.fullname" . }}-resourcemanager
       export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
       echo http://$NODE_IP:$NODE_PORT
-    {{- else if contains "LoadBalancer" .Values.yarn.service.type }}
+    {{- else if contains "LoadBalancer" .Values.resourcemanager.service.type }}
          NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-               You can watch the status of by running 'kubectl get svc -w {{ include "hadoop.fullname" . }}-yarn-webui'
-      export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "hadoop.fullname" . }}-yarn-webui -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-      echo http://$SERVICE_IP:{{ .Values.yarn.service.port }}
-    {{- else if contains "ClusterIP" .Values.yarn.service.type }}
+               You can watch the status of by running 'kubectl get svc -w {{ include "hadoop.fullname" . }}-resourcemanager'
+      export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "hadoop.fullname" . }}-resourcemanager -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+      echo http://$SERVICE_IP:{{ .Values.resourcemanager.service.port }}
+    {{- else if contains "ClusterIP" .Values.resourcemanager.service.type }}
       echo "Visit http://127.0.0.1:80 to use your application"
-      kubectl port-forward svc/{{ include "hadoop.fullname" . }}-yarn-webui 80:80 --namespace {{ .Release.Namespace }}
+      kubectl port-forward svc/{{ include "hadoop.fullname" . }}-resourcemanager 80:80 --namespace {{ .Release.Namespace }}
     {{- end }}
