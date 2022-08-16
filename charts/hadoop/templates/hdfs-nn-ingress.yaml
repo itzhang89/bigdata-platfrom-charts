@@ -18,13 +18,26 @@ metadata:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
+{{- if .Values.ingress.nameNode.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.nameNode.ingressClassName }}
+{{- end }}
+{{- if .Values.ingress.nameNode.tls }}
+  tls:
+  {{- range .Values.ingress.nameNode.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
   rules:
   {{- range .Values.ingress.nameNode.hosts }}
     - host: {{ . }}
       http:
         paths:
           - path: {{ $ingressPath }}
-            pathType: ImplementationSpecific
+            pathType: {{ $.Values.ingress.nameNode.pathType }}
             backend:
               service:
                 name: {{ $fullname }}-namenode

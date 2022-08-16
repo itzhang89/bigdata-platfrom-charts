@@ -30,6 +30,13 @@ nameNode:
   port: 9820
   httpPort: 9870
   httpsPort: 9871
+  service:
+    type: ClusterIP
+    port: 80
+    annotations: { }
+    # cloud.google.com/load-balancer-type: "Internal"
+    loadBalancerIP: null
+
   resources:
     requests:
       memory: "256Mi"
@@ -79,10 +86,15 @@ ingress:
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     }
-    labels: {}
+    labels: { }
     path: /
+    pathType: ImplementationSpecific
     hosts:
-    - "hdfs-namenode.local"
+      - "hdfs-namenode.local"
+    tls: [ ]
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
   dataNode:
     enabled: false
     annotations: {
