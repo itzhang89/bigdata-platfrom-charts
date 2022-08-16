@@ -2,29 +2,28 @@
    kubectl exec -n {{ .Release.Namespace }} -it {{ include "hadoop.fullname" . }}-namenode-0 -- hdfs dfsadmin -report
 
 2. Create a port-forward to the hdfs manager UI:
-   kubectl port-forward -n {{ .Release.Namespace }} {{ include "hadoop.fullname" . }}-namenode-0 {{ .Values.nameNode.httpPort }}:{{ .Values.nameNode.httpPort }}
 
-   Then open the hdfs web ui in your browser:
+   Then open the HDFS Web UI in your browser:
 
     {{- if .Values.ingress.nameNode.enabled }}
     {{- range .Values.ingress.nameNode.hosts }}
       http{{ if $.Values.ingress.nameNode.tls }}s{{ end }}://{{ . }}{{ $.Values.ingress.nameNode.path }}
     {{- end }}
     {{- else if contains "NodePort" .Values.nameNode.service.type }}
-      export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "hadoop.fullname" . }}-nameNode
+      export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "hadoop.fullname" . }}-namenode
       export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
       echo http://$NODE_IP:$NODE_PORT
     {{- else if contains "LoadBalancer" .Values.nameNode.service.type }}
          NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-               You can watch the status of by running 'kubectl get svc -w {{ include "hadoop.fullname" . }}-nameNode'
-      export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "hadoop.fullname" . }}-nameNode -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+               You can watch the status of by running 'kubectl get svc -w {{ include "hadoop.fullname" . }}-namenode'
+      export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "hadoop.fullname" . }}-namenode -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
       echo http://$SERVICE_IP:{{ .Values.nameNode.service.port }}
     {{- else if contains "ClusterIP" .Values.nameNode.service.type }}
-      echo "Visit http://127.0.0.1:80 to use your application"
-      kubectl port-forward svc/{{ include "hadoop.fullname" . }}-nameNode 9870:9870 --namespace {{ .Release.Namespace }}
+      echo "Visit http://127.0.0.1:{{ .Values.nameNode.httpPort }} to use your application"
+      kubectl port-forward svc/{{ include "hadoop.fullname" . }}-namenode {{ .Values.nameNode.httpPort }}:{{ .Values.nameNode.httpPort }} --namespace {{ .Release.Namespace }}
     {{- end }}
 
-   Then open the yarn web ui in your browser:
+   Then open the ResourceManager Web UI in your browser:
 
     {{- if .Values.ingress.resourcemanager.enabled }}
     {{- range .Values.ingress.resourcemanager.hosts }}
@@ -43,3 +42,26 @@
       echo "Visit http://127.0.0.1:80 to use your application"
       kubectl port-forward svc/{{ include "hadoop.fullname" . }}-resourcemanager 80:80 --namespace {{ .Release.Namespace }}
     {{- end }}
+
+{{- if .Values.historyserver.enabled }}
+
+    Then open the MapReduce JobHistory Server Web UI in your browser:
+
+    {{- if .Values.ingress.resourcemanager.enabled }}
+    {{- range .Values.ingress.historyserver.hosts }}
+      http{{ if $.Values.ingress.historyserver.tls }}s{{ end }}://{{ . }}{{ $.Values.ingress.historyserver.path }}
+    {{- end }}
+    {{- else if contains "NodePort" .Values.historyserver.service.type }}
+      export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "hadoop.fullname" . }}-historyserver
+      export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+      echo http://$NODE_IP:$NODE_PORT
+    {{- else if contains "LoadBalancer" .Values.historyserver.service.type }}
+         NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+               You can watch the status of by running 'kubectl get svc -w {{ include "hadoop.fullname" . }}-historyserver'
+      export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "hadoop.fullname" . }}-historyserver -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+      echo http://$SERVICE_IP:{{ .Values.historyserver.service.port }}
+    {{- else if contains "ClusterIP" .Values.historyserver.service.type }}
+      echo "Visit http://127.0.0.1:{{ .Values.historyserver.service.port }} to use your application"
+      kubectl port-forward svc/{{ include "hadoop.fullname" . }}-historyserver {{ .Values.historyserver.service.port }}:{{ .Values.historyserver.service.port }} --namespace {{ .Release.Namespace }}
+    {{- end }}
+{{- end }}

@@ -71,13 +71,33 @@ resourcemanager:
     annotations: { }
     # cloud.google.com/load-balancer-type: "Internal"
     loadBalancerIP: null
+  resources:
+    requests:
+      memory: "1024Mi"
+      cpu: "500m"
+    limits:
+      memory: "4096Mi"
+      cpu: "2000m"
 
 nodemanager:
-  replicas: 1
+  replicas: 3
   port: 8088
   httpPort: 8042
   httpsPort: 443
+  pdbMinAvailable: 3
+
+historyserver:
+  enabled: true
+  replicas: 1
+  # historyserver container port. Default HTTP port is 19888.
+  port: 19888
   pdbMinAvailable: 1
+  service:
+    type: ClusterIP
+    port: 80
+    annotations: { }
+    # cloud.google.com/load-balancer-type: "Internal"
+    loadBalancerIP: null
 
 ingress:
   nameNode:
@@ -133,6 +153,24 @@ ingress:
     #  - secretName: chart-example-tls
     #    hosts:
     #      - chart-example.local
+  historyserver:
+    enabled: false
+    # ingressClassName: nginx
+    annotations: {
+      # kubernetes.io/tls-acme: "true"
+      ## Extend timeout to allow long running queries.
+      # nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+      # nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+      # nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    }
+    path: /
+    pathType: ImplementationSpecific
+    hosts:
+      - "historyserver.local"
+    tls: [ ]
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
 
 persistence:
   nameNode:
@@ -145,6 +183,7 @@ persistence:
     storageClass:
     accessMode: ReadWriteOnce
     size: 200Gi
+
 
 ## ------------------------------------------------------
 ## Monitoring HDFS-NameNode

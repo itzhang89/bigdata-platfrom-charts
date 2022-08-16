@@ -77,6 +77,12 @@ EOM
   fi
 fi
 # ------------------------------------------------------
+# Start MapReduce JobHistory Server as daemons
+# ------------------------------------------------------
+if [[ $2 == "historyserver" ]]; then
+  $HADOOP_HOME/bin/mapred  --loglevel {{ .Values.logLevel }} --daemon start historyserver
+fi
+# ------------------------------------------------------
 # Tail logfiles for daemonized workloads (parameter -d)
 # ------------------------------------------------------
 if [[ $1 == "-d" ]]; then

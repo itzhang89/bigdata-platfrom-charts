@@ -52,6 +52,15 @@
         <value>1080</value>
     </property>
     <property>
+        <description>Whether to enable log aggregation</description>
+        <name>yarn.log-aggregation-enable</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>yarn.log.server.url</name>
+        <value>http://{{ include "hadoop.fullname" . }}-historyserver-hl:{{ .Values.historyserver.port }}/jobhistory/logs</value>
+    </property>
+    <property>
         <name>yarn.application.classpath</name>
         <value>
             /opt/hadoop/etc/hadoop,

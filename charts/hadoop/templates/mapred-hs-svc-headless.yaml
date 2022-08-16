@@ -1,0 +1,26 @@
+{{- if .Values.historyserver.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "hadoop.fullname" . }}-historyserver-hl
+  labels:
+    app.kubernetes.io/name: {{ include "hadoop.name" . }}
+    app.kubernetes.io/component: historyserver
+    {{- include "hadoop.labels" . | nindent 4 }}
+{{- with .Values.historyserver.service.annotations }}
+  annotations:
+{{- toYaml . | nindent 4 }}
+{{- end }}
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - port: {{ .Values.historyserver.port }}
+      protocol: TCP
+      targetPort: {{ .Values.historyserver.port }}
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "hadoop.name" . }}
+    app.kubernetes.io/component: historyserver
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
