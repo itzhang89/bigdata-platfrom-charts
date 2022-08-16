@@ -4,7 +4,26 @@
 2. Create a port-forward to the hdfs manager UI:
    kubectl port-forward -n {{ .Release.Namespace }} {{ include "hadoop.fullname" . }}-namenode-0 {{ .Values.nameNode.httpPort }}:{{ .Values.nameNode.httpPort }}
 
-   Then open the ui in your browser:
+   Then open the hdfs ui in your browser:
 
    open http://localhost:{{ .Values.nameNode.httpPort }}
 
+   Then open the yarn web ui in your browser:
+
+    {{- if .Values.ingress.yarn.enabled }}
+    {{- range .Values.ingress.yarn.hosts }}
+      http{{ if $.Values.ingress.yarn.tls }}s{{ end }}://{{ . }}{{ $.Values.ingress.yarn.path }}
+    {{- end }}
+    {{- else if contains "NodePort" .Values.yarn.service.type }}
+      export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "hadoop.fullname" . }}-yarn-webui
+      export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+      echo http://$NODE_IP:$NODE_PORT
+    {{- else if contains "LoadBalancer" .Values.yarn.service.type }}
+         NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+               You can watch the status of by running 'kubectl get svc -w {{ include "hadoop.fullname" . }}-yarn-webui'
+      export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "hadoop.fullname" . }}-yarn-webui -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+      echo http://$SERVICE_IP:{{ .Values.yarn.service.port }}
+    {{- else if contains "ClusterIP" .Values.yarn.service.type }}
+      echo "Visit http://127.0.0.1:80 to use your application"
+      kubectl port-forward svc/{{ include "hadoop.fullname" . }}-yarn-webui 80:80 --namespace {{ .Release.Namespace }}
+    {{- end }}

@@ -9,7 +9,7 @@ metadata:
 spec:
   ports:
   - port: 8088
-    name: web
+    name: http
   clusterIP: None
   selector:
     app.kubernetes.io/name: {{ include "hadoop.name" . }}

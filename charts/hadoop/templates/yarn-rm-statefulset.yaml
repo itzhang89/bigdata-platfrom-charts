@@ -50,7 +50,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         ports:
         - containerPort: 8088
-          name: web
+          name: http
         command:
         - "/bin/bash"
         - "/tmp/hadoop-config/bootstrap.sh"

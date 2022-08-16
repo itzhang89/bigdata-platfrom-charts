@@ -66,6 +66,13 @@ nodemanager:
   httpsPort: 443
   pdbMinAvailable: 1
 
+yarn:
+  service:
+    type: NodePort
+    port: 80
+    annotations: { }
+    # cloud.google.com/load-balancer-type: "Internal"
+    loadBalancerIP: null
 
 ingress:
   nameNode:
@@ -94,10 +101,28 @@ ingress:
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     }
-    labels: {}
+    labels: { }
     path: /
     hosts:
-    - "httpfs.local"
+      - "httpfs.local"
+  yarn:
+    enabled: true
+    # ingressClassName: nginx
+    annotations: {
+      # kubernetes.io/tls-acme: "true"
+      ## Extend timeout to allow long running queries.
+      # nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+      # nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+      # nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    }
+    path: /
+    pathType: ImplementationSpecific
+    hosts:
+      - "yarn.local"
+    tls: [ ]
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
 
 persistence:
   nameNode:
