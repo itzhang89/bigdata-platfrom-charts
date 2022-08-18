@@ -58,18 +58,18 @@ spec:
         - "nodemanager"
         resources:
 {{ toYaml .Values.nodemanager.resources | indent 10 }}
-#        readinessProbe:
-#          httpGet:
-#            path: /node
-#            port: 8042
-#          initialDelaySeconds: 10
-#          timeoutSeconds: 2
-#        livenessProbe:
-#          httpGet:
-#            path: /node
-#            port: 8042
-#          initialDelaySeconds: 10
-#          timeoutSeconds: 2
+        readinessProbe:
+          httpGet:
+            path: /node
+            port: 8042
+          initialDelaySeconds: 10
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /node
+            port: 8042
+          initialDelaySeconds: 10
+          timeoutSeconds: 2
         volumeMounts:
         - name: hadoop-config
           mountPath: /tmp/hadoop-config

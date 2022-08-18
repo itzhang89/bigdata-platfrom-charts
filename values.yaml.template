@@ -18,6 +18,10 @@ postgresql-interval:
           CREATE ROLE airflow WITH ENCRYPTED PASSWORD 'Airflow@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE airflow TO airflow;
           
+          CREATE DATABASE dolphinscheduler;
+          CREATE ROLE dolphinscheduler WITH ENCRYPTED PASSWORD 'Dolphinscheduler@2022' LOGIN;
+          GRANT ALL PRIVILEGES ON DATABASE dolphinscheduler TO dolphinscheduler;
+          
           CREATE DATABASE metastore;
           CREATE ROLE hive WITH ENCRYPTED PASSWORD 'Hive@2022' LOGIN;
           GRANT ALL PRIVILEGES ON DATABASE metastore TO hive;
@@ -105,7 +109,7 @@ openldap:
     ingress:
       enabled: true
       hostname: phpldapadmin.demo.com
-hdfs:
+hadoop:
   enabled: true
   conf:
     coreSite:
@@ -126,6 +130,10 @@ hdfs:
       enabled: true
       hosts:
         - hdfs.demo.com
+    resourcemanager:
+      enabled: true
+      hosts:
+        - resourcemanager.demo.com
 hive:
   enabled: true
   hive-metastore:
@@ -140,7 +148,7 @@ hive:
         password: "Hive@2022"
   conf:
     hiveSite:
-      hive.metastore.warehouse.dir: hdfs://$releaseName-hdfs-namenode:9820/user/hive/warehouse
+      hive.metastore.warehouse.dir: hdfs://$releaseName-hadoop-namenode:9820/user/hive/warehouse
       hive.metastore.schema.verification: false
 spark:
   enabled: true
@@ -290,8 +298,8 @@ hue:
       [hadoop]
       [[hdfs_clusters]]
       [[[default]]]
-      fs_defaultfs=hdfs://{{ template "platform.hdfs" . }}:9820
-      webhdfs_url=http://{{ template "platform.hdfs" . }}-httpfs:14000/webhdfs/v1
+      fs_defaultfs=hdfs://{{ template "platform.hadoop" . }}:9820
+      webhdfs_url=http://{{ template "platform.hadoop" . }}-httpfs:14000/webhdfs/v1
   aws:
     accessKeyId: ""
     secretAccessKey: ""
@@ -365,3 +373,27 @@ opentsdb:
   enabled: false
 dolphinscheduler:
   enabled: false
+  postgresql:
+    enabled: false
+  conf:
+    common:
+      resource.storage.type: HDFS
+      fs.defaultFS: hdfs://$releaseName-hadoop-namenode:9820
+  externalDatabase:
+    type: "postgresql"
+    host: "$releaseName-postgresql-interval"
+    port: "5432"
+    username: "dolphinscheduler"
+    password: "Dolphinscheduler@2022"
+    database: "dolphinscheduler"
+    params: "characterEncoding=utf8"
+  common:
+    sharedStoragePersistence:
+      enabled: true
+      storageClassName: rook-cephfs
+  ingress:
+    enabled: true
+    host: "dolphinscheduler.demo.com"
+    path: "/"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: 2048m

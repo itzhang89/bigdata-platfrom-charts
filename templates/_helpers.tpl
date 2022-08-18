@@ -74,11 +74,11 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{- define "platform.hdfs" -}}
+{{- define "platform.hadoop" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- $name := default "hdfs" .Values.nameOverride }}
+{{- $name := default "hadoop" .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- else }}
