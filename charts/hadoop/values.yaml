@@ -85,6 +85,13 @@ nodemanager:
   httpPort: 8042
   httpsPort: 443
   pdbMinAvailable: 3
+  resources:
+    requests:
+      memory: "8192Mi"
+      cpu: "4000m"
+    limits:
+      memory: "8192Mi"
+      cpu: "4000m"
 
 historyserver:
   enabled: true

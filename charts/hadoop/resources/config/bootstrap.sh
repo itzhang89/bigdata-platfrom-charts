@@ -55,18 +55,6 @@ fi
 # ------------------------------------------------------
 if [[ $2 == "nodemanager" ]]; then
   [[ ! -d /data ]] && mkdir /data
-  sed -i '/<\/configuration>/d' $HADOOP_HOME/etc/hadoop/yarn-site.xml
-  cat >> $HADOOP_HOME/etc/hadoop/yarn-site.xml <<- EOM
-  <property>
-    <name>yarn.nodemanager.resource.memory-mb</name>
-    <value>${MY_MEM_LIMIT:-2048}</value>
-  </property>
-  <property>
-    <name>yarn.nodemanager.resource.cpu-vcores</name>
-    <value>${MY_CPU_LIMIT:-2}</value>
-  </property>
-EOM
-  echo '</configuration>' >> $HADOOP_HOME/etc/hadoop/yarn-site.xml
   # Wait with timeout for resourcemanager
   TMP_URL="http://{{ include "hadoop.fullname" . }}-resourcemanager-hl:8088/ws/v1/cluster/info"
   if timeout 5m bash -c "until curl -sf $TMP_URL; do echo Waiting for $TMP_URL; sleep 5; done"; then
@@ -80,7 +68,12 @@ fi
 # Start MapReduce JobHistory Server as daemons
 # ------------------------------------------------------
 if [[ $2 == "historyserver" ]]; then
+  if timeout 5m bash -c "until nc -vz {{ include "hadoop.fullname" . }}-namenode {{ .Values.nameNode.port }} -w2; do echo Waiting for namenode; sleep 5; done"; then
   $HADOOP_HOME/bin/mapred  --loglevel {{ .Values.logLevel }} --daemon start historyserver
+  else
+    echo "$0: Timeout waiting for namenode, exiting."
+    exit 1
+  fi
 fi
 # ------------------------------------------------------
 # Tail logfiles for daemonized workloads (parameter -d)

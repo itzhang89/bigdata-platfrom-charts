@@ -59,18 +59,18 @@ spec:
         - "historyserver"
         resources:
 {{ toYaml .Values.historyserver.resources | indent 10 }}
-#        readinessProbe:
-#          httpGet:
-#            path: /ws/v1/cluster/info
-#            port: 8088
-#          initialDelaySeconds: 5
-#          timeoutSeconds: 2
-#        livenessProbe:
-#          httpGet:
-#            path: /ws/v1/cluster/info
-#            port: 8088
-#          initialDelaySeconds: 10
-#          timeoutSeconds: 2
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.historyserver.port }}
+          initialDelaySeconds: 5
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.historyserver.port }}
+          initialDelaySeconds: 10
+          timeoutSeconds: 2
         volumeMounts:
         - name: hadoop-config
           mountPath: /tmp/hadoop-config

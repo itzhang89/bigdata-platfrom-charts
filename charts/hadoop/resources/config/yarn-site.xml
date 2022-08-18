@@ -75,7 +75,53 @@
         </value>
     </property>
 
+    <!-- 设置RM内存资源配置，两个参数 -->
+    <property>
+        <description>The minimum allocation for every container request at the RM,
+            in MBs. Memory requests lower than this won't take effect,
+            and the specified value will get allocated at minimum.
+        </description>
+        <name>yarn.scheduler.minimum-allocation-mb</name>
+        <value>1024</value>
+    </property>
+    <property>
+        <description>The maximum allocation for every container request at the RM,
+            in MBs. Memory requests higher than this won't take effect,
+            and will get capped to this value.
+        </description>
+        <name>yarn.scheduler.maximum-allocation-mb</name>
+        <value>4096</value>
+    </property>
+
+    <!-- 前者表示单个节点可用的最大内存，RM中的两个值都不应该超过该值。后者表示虚拟内存率，即占task所用内存的百分比，默认为2.1.-->
+    <property>
+        <description>Amount of physical memory, in MB, that can be allocated
+            for containers.
+        </description>
+        <name>yarn.nodemanager.resource.memory-mb</name>
+        <value>8192</value>
+    </property>
+    <property>
+        <description>Ratio between virtual memory to physical memory when
+            setting memory limits for containers. Container allocations are
+            expressed in terms of physical memory, and virtual memory usage
+            is allowed to exceed this allocation by this ratio.
+        </description>
+        <name>yarn.nodemanager.vmem-pmem-ratio</name>
+        <value>2.1</value>
+    </property>
+    <property>
+        <description>Amount of physical memory, in MB, that can be allocated
+            for containers.
+        </description>
+        <name>yarn.app.mapreduce.am.resource.mb</name>
+        <value>4096</value>
+    </property>
+
     {{- range $key, $value := index .Values.conf "yarnSite" }}
-    <property><name>{{ $key }}</name><value>{{ $value }}</value></property>
+    <property>
+        <name>{{ $key }}</name>
+        <value>{{ $value }}</value>
+    </property>
     {{- end }}
 </configuration>
