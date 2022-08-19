@@ -363,14 +363,6 @@ superset:
       # 绑定某个初始账号，我这里用的app组织的账号，跟上面People不是同一个ou,无所谓，能登录就行，主要是不希望配置个人账号到应用里。
       AUTH_LDAP_BIND_USER = "cn=admin,dc=demo,dc=com"
       AUTH_LDAP_BIND_PASSWORD = "Root@2022"
-hbase:
-  enabled: false
-jupyter:
-  enabled: false
-kafka-connect-ui:
-  enabled: false
-opentsdb:
-  enabled: false
 dolphinscheduler:
   enabled: true
   postgresql:

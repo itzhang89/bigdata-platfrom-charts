@@ -32,6 +32,9 @@ keywords:
 # a dependency of application charts to inject those utilities and functions into the rendering
 # pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
+maintainers:
+  - email: itzhang89@163.com
+    name: itzhang89
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
@@ -43,16 +46,10 @@ appVersion: 3.0.0
 
 dependencies:
 - name: postgresql
-  version: 10.3.18
-  # Due to a change in the Bitnami repo, https://charts.bitnami.com/bitnami was truncated only
-  # containing entries for the latest 6 months (from January 2022 on).
-  # This URL: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
-  # contains the full 'index.yaml'.
-  # See detail here: https://github.com/bitnami/charts/issues/10833
-  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  version: ~11.6.0
+  repository: https://charts.bitnami.com/bitnami
   condition: postgresql.enabled
 - name: zookeeper
-  version: 6.5.3
-  # Same as above.
-  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  version: ~10.0.0
+  repository: https://charts.bitnami.com/bitnami
   condition: zookeeper.enabled

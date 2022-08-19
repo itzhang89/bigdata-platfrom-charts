@@ -6,7 +6,7 @@ dependencies:
     version: ~0.1.5
   - condition: hadoop.enabled
     name: hadoop
-    repository: https://yutianaiqingtian.github.io/bigdata-platfrom-charts
+#    repository: https://yutianaiqingtian.github.io/bigdata-platfrom-charts
     version: ~1.0.0
 description: The Apache Hive ™ data warehouse software facilitates reading, writing,
   and managing large datasets residing in distributed storage using SQL. Structure

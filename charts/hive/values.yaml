@@ -16,10 +16,6 @@ hive-metastore:
       database: "metastore"
       username: "hive"
       password: "hive"
-#####################################################
-# Also deploy hdfs requirement
-hdfs:
-  enabled: false
 
 conf:
   logLevel: INFO
