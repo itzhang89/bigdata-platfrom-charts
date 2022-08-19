@@ -150,6 +150,7 @@ hive:
     hiveSite:
       hive.metastore.warehouse.dir: hdfs://$releaseName-hadoop-namenode:9820/user/hive/warehouse
       hive.metastore.schema.verification: false
+    hadoopConfigMap: $releaseName-hadoop-hadoop
 spark:
   enabled: true
   ingress:
