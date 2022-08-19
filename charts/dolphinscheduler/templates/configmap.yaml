@@ -17,9 +17,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-configs
+  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-configs
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-common
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-common
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 data:
   common_properties: |-

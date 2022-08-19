@@ -17,7 +17,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-db-init-job
+  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-db-init-job
   labels:
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
@@ -34,7 +34,7 @@ spec:
       initContainers:
         {{- include "dolphinscheduler.database.wait-for-ready" . | nindent 6 }}
       containers:
-        - name: {{ include "dolphinscheduler.fullname" . }}-db-init-job
+        - name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-db-init-job
           image: {{ include "dolphinscheduler.image.fullname.tools" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
@@ -49,4 +49,4 @@ spec:
             {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
           envFrom:
             - configMapRef:
-                name: {{ include "dolphinscheduler.fullname" . }}-common
+                name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-common

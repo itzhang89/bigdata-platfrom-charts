@@ -18,9 +18,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-alert
+  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-alert
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-alert
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 spec:
   accessModes:

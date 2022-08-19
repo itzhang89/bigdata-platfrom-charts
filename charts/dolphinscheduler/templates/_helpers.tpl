@@ -58,7 +58,7 @@ app.kubernetes.io/version: {{ .Chart.AppVersion }}
 Create a master labels.
 */}}
 {{- define "dolphinscheduler.master.labels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
 app.kubernetes.io/component: master
 {{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
@@ -67,7 +67,7 @@ app.kubernetes.io/component: master
 Create a worker labels.
 */}}
 {{- define "dolphinscheduler.worker.labels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker
 app.kubernetes.io/component: worker
 {{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
@@ -76,7 +76,7 @@ app.kubernetes.io/component: worker
 Create an alert labels.
 */}}
 {{- define "dolphinscheduler.alert.labels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-alert
 app.kubernetes.io/component: alert
 {{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
@@ -85,7 +85,7 @@ app.kubernetes.io/component: alert
 Create an api labels.
 */}}
 {{- define "dolphinscheduler.api.labels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
 app.kubernetes.io/component: api
 {{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
@@ -145,7 +145,7 @@ Create a database environment variables.
       name: {{ template "dolphinscheduler.postgresql.fullname" . }}
       key: postgresql-password
       {{- else }}
-      name: {{ include "dolphinscheduler.fullname" . }}-externaldb
+      name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-externaldb
       key: database-password
       {{- end }}
 {{- end -}}
@@ -191,7 +191,7 @@ Create a common fs_s3a environment variables.
   valueFrom:
     secretKeyRef:
       key: fs-s3a-secret-key
-      name: {{ include "dolphinscheduler.fullname" . }}-fs-s3a
+      name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-fs-s3a
 {{- end -}}
 {{- end -}}
 
@@ -200,9 +200,9 @@ Create a sharedStoragePersistence volume.
 */}}
 {{- define "dolphinscheduler.sharedStorage.volume" -}}
 {{- if .Values.common.sharedStoragePersistence.enabled -}}
-- name: {{ include "dolphinscheduler.fullname" . }}-shared
+- name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-shared
   persistentVolumeClaim:
-    claimName: {{ include "dolphinscheduler.fullname" . }}-shared
+    claimName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-shared
 {{- end -}}
 {{- end -}}
 
@@ -212,7 +212,7 @@ Create a sharedStoragePersistence volumeMount.
 {{- define "dolphinscheduler.sharedStorage.volumeMount" -}}
 {{- if .Values.common.sharedStoragePersistence.enabled -}}
 - mountPath: {{ .Values.common.sharedStoragePersistence.mountPath | quote }}
-  name: {{ include "dolphinscheduler.fullname" . }}-shared
+  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-shared
 {{- end -}}
 {{- end -}}
 
@@ -221,9 +221,9 @@ Create a fsFileResourcePersistence volume.
 */}}
 {{- define "dolphinscheduler.fsFileResource.volume" -}}
 {{- if .Values.common.fsFileResourcePersistence.enabled -}}
-- name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+- name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-fs-file
   persistentVolumeClaim:
-    claimName: {{ include "dolphinscheduler.fullname" . }}-fs-file
+    claimName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-fs-file
 {{- end -}}
 {{- end -}}
 
@@ -233,6 +233,6 @@ Create a fsFileResourcePersistence volumeMount.
 {{- define "dolphinscheduler.fsFileResource.volumeMount" -}}
 {{- if .Values.common.fsFileResourcePersistence.enabled -}}
 - mountPath: {{ default "/dolphinscheduler" .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
-  name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-fs-file
 {{- end -}}
 {{- end -}}

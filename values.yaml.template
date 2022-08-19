@@ -372,7 +372,7 @@ kafka-connect-ui:
 opentsdb:
   enabled: false
 dolphinscheduler:
-  enabled: false
+  enabled: true
   postgresql:
     enabled: false
   conf:
@@ -388,6 +388,9 @@ dolphinscheduler:
     database: "dolphinscheduler"
     params: "characterEncoding=utf8"
   common:
+    configmap:
+      RESOURCE_STORAGE_TYPE: "HDFS"
+      FS_DEFAULT_FS: "hdfs://$releaseName-hadoop-namenode:9820"
     sharedStoragePersistence:
       enabled: true
       storageClassName: rook-cephfs
