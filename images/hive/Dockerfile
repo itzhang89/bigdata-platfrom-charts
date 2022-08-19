@@ -17,13 +17,12 @@ ENV HADOOP_HOME /opt/hadoop-$HADOOP_VERSION
 WORKDIR /opt
 
 #Install Hive and PostgreSQL JDBC
-RUN apt-get update && apt-get install -y wget procps && \
-	wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
+RUN apt-get update && apt-get install -y procps && \
+	curl -kfSLO https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
 	tar -xzvf apache-hive-$HIVE_VERSION-bin.tar.gz -C /opt && \
 	ln -s apache-hive-$HIVE_VERSION-bin hive && \
     curl -kfSL https://jdbc.postgresql.org/download/postgresql-$PG_LIB_VERSION.jar -o $HIVE_HOME/lib/postgresql-jdbc.jar && \
 	rm apache-hive-$HIVE_VERSION-bin.tar.gz && \
-	apt-get --purge remove -y wget && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
@@ -49,6 +48,10 @@ RUN chmod +x /usr/local/bin/startup-metastore.sh
 
 COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# create hive user and group
+RUN groupadd -g 971 -r hive \
+    && useradd --comment "Hive User" -u 971 --shell /bin/bash -M -r -N --groups hadoop,hive --home /var/lib/hadoop/hive hive
 
 EXPOSE 10000
 EXPOSE 10002
