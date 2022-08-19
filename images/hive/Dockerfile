@@ -1,4 +1,4 @@
-FROM 5200710/hadoop-base:hadoop3.2.3-java8
+FROM 5200710/hadoop:3.2.3-java8
 
 MAINTAINER itzhang89 <itzhang89@163.com>
 
