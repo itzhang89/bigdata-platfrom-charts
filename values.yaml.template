@@ -284,7 +284,7 @@ hue:
 
       [beeswax]
       # Host where HiveServer2 is running.
-      hive_server_host=$releaseName-hive-server
+      hive_server_host=$releaseName-hive-hive-server
       # Port where HiveServer2 Thrift server runs on.
       hive_server_port=10000
       thrift_version=7
@@ -300,6 +300,17 @@ hue:
       [[[default]]]
       fs_defaultfs=hdfs://{{ template "platform.hadoop" . }}:9820
       webhdfs_url=http://{{ template "platform.hadoop" . }}-httpfs:14000/webhdfs/v1
+      
+      # Configuration for YARN (MR2)
+      # ------------------------------------------------------------------------
+      [[yarn_clusters]]
+      [[[default]]]
+      resourcemanager_host={{ template "platform.hadoop" . }}-resourcemanager-hl
+      resourcemanager_api_url=http://{{ template "platform.hadoop" . }}-resourcemanager-hl:8088/
+      resourcemanager_port=8032
+      history_server_api_url=http://{{ template "platform.hadoop" . }}-historyserver-hl:19888/
+      spark_history_server_url=http://{{ template "platform.hadoop" . }}-spark-master-svc:18080
+
   aws:
     accessKeyId: ""
     secretAccessKey: ""
