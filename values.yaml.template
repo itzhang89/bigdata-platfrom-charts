@@ -113,8 +113,6 @@ hadoop:
   enabled: true
   conf:
     coreSite:
-      hadoop.proxyuser.httpfs.hosts: "*"
-      hadoop.proxyuser.httpfs.groups: "*"
       hadoop.proxyuser.hue.hosts: "*"
       hadoop.proxyuser.hue.groups: "*"
 
@@ -125,6 +123,8 @@ hadoop:
     httpfsSite:
       httpfs.proxyuser.hue.hosts: "*"
       httpfs.proxyuser.hue.groups: "*"
+      hadoop.proxyuser.httpfs.hosts: "*"
+      hadoop.proxyuser.httpfs.groups: "*"
   ingress:
     nameNode:
       enabled: true
