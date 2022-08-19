@@ -284,7 +284,7 @@ hue:
 
       [beeswax]
       # Host where HiveServer2 is running.
-      hive_server_host=$releaseName-hive-hive-server
+      hive_server_host=$releaseName-hive-HiveServer
       # Port where HiveServer2 Thrift server runs on.
       hive_server_port=10000
       thrift_version=7
