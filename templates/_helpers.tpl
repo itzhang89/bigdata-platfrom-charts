@@ -65,7 +65,7 @@ Create the name of the service account to use
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- $name := default "postgresql-interval" .Values.nameOverride }}
+{{- $name := default "postgresql-interval-hl" .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- else }}

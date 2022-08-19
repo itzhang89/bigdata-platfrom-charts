@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "hive.fullname" . }}-server
+  name: {{ include "hive.fullname" . }}-hive-server
   labels:
     app.kubernetes.io/name: {{ include "hive.name" . }}
     app.kubernetes.io/component: server
@@ -12,7 +12,7 @@ spec:
       app.kubernetes.io/name: {{ include "hive.name" . }}
       app.kubernetes.io/component: server
       app.kubernetes.io/instance: {{ .Release.Name | quote }}
-  serviceName: {{ include "hive.fullname" . }}-server
+  serviceName: {{ include "hive.fullname" . }}-hive-server
   replicas: 1
   template:
     metadata:
@@ -50,11 +50,11 @@ spec:
       volumes:
       - name: hive-config
         configMap:
-          name: {{ include "hive.fullname" . }}-hive-config
+          name: {{ include "hive.fullname" . }}-hive-hive-config
       - name: hadoop-config
         configMap:
           {{- if .Values.conf.hadoopConfigMap }}
           name: {{ .Values.conf.hadoopConfigMap }}
           {{- else }}
-          name: {{ include "hive.fullname" . }}-hadoop-config
+          name: {{ include "hive.fullname" . }}-hive-hadoop-config
           {{- end }}
