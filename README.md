@@ -8,12 +8,12 @@ Curated Big Data charts for Kubernetes.
 
 charts in `charts/` folder are packaged and available at yutianaiqingtian's helm repo:  
 
-[https://yutianaiqingtian.github.io/bigdata-charts/](https://yutianaiqingtian.github.io/bigdata-charts/)
+[https://yutianaiqingtian.github.io/bigdata-platfrom-charts/](https://yutianaiqingtian.github.io/bigdata-platfrom-charts/)
 
 You can add the helm repo to your Helm CLI:
 
 ```bash
-helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-charts/
+helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts/
 ```
 
 Then you have a collection of charts available to install. For example, to install hdfs:
@@ -51,7 +51,7 @@ Test specific chart, lint and install, send console logs also to the log file `r
 ```bash
 scripts/ct.sh lint-and-install \
     --charts charts/hdfs/ \
-    --chart-repos incubator=https://kubernetes-charts-incubator.storage.googleapis.com/,gradiant=https://yutianaiqingtian.github.io/bigdata-charts \
+    --chart-repos incubator=https://kubernetes-charts-incubator.storage.googleapis.com/,gradiant=https://yutianaiqingtian.github.io/bigdata-platfrom-charts \
     | tee reports/hdfs.log
 ```
 
@@ -84,7 +84,7 @@ scripts/ct.sh lint-and-install \
     --check-version-increment \
     --upgrade \
     --charts charts/hdfs/ \
-    --chart-repos incubator=https://kubernetes-charts-incubator.storage.googleapis.com/,yutianaiqingtian=https://yutianaiqingtian.github.io/bigdata-charts \
+    --chart-repos incubator=https://kubernetes-charts-incubator.storage.googleapis.com/,yutianaiqingtian=https://yutianaiqingtian.github.io/bigdata-platfrom-charts \
     | tee reports/hdfs.log
 ```
 
