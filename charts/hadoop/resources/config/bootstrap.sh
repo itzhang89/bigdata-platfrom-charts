@@ -17,14 +17,6 @@ for f in slaves core-site.xml hdfs-site.xml mapred-site.xml yarn-site.xml httpfs
     fi
 done
 
-# create hdfs, yarn, hadoop group if not existed
-[[ ! $(getent group hadoop) ]] && groupadd -g 999 -r hadoop
-[[ ! $(getent group hdfs) ]] && groupadd -g 991 -r hdfs
-[[ ! $(getent group yarn) ]] && groupadd -g 995 -r yarn
-# create hdfs and yarn user if not existed
-[[ ! $(id hdfs > /dev/null 2>&1) ]] && useradd --comment "HDFS User" -u 992 --shell /bin/bash -M -r -N --groups hadoop,hdfs --home /var/lib/hadoop/hdfs hdfs
-[[ ! $(id yarn > /dev/null 2>&1) ]] && useradd --comment "Yarn User" -u 996 --shell /bin/bash -M -r -N --groups hadoop,yarn --home /var/lib/hadoop/yarn yarn
-
 # installing libraries if any - (resource urls added comma separated to the ACP system variable)
 cd $HADOOP_HOME/share/hadoop/common ; for cp in ${ACP//,/ }; do  echo == $cp; curl -LO $cp ; done; cd -
 

@@ -49,7 +49,7 @@ jobs:
         with:
           context: ./images/hadoop/base
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/hadoop-base:hadoop3.2.3-java8
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/hadoop:3.2.3-java8
   # This workflow contains a single job called "build"
   build_hive_image:
     # The type of runner that the job will run on

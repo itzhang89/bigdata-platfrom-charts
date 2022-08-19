@@ -28,6 +28,13 @@ RUN curl https://dist.apache.org/repos/dist/release/hadoop/common/KEYS | gpg --i
     && ln -s $HADOOP_HOME/etc/hadoop /etc/hadoop \
     && rm /tmp/hadoop.tar.gz*
 
+# create hdfs, yarn, hadoop group and create hdfs and yarn user
+RUN groupadd -g 999 -r hadoop \
+    && groupadd -g 991 -r hdfs \
+    && groupadd -g 995 -r yarn \
+    && useradd --comment "HDFS User" -u 992 --shell /bin/bash -M -r -N --groups hadoop,hdfs --home /var/lib/hadoop/hdfs hdfs \
+    && useradd --comment "Yarn User" -u 996 --shell /bin/bash -M -r -N --groups hadoop,yarn --home /var/lib/hadoop/yarn yarn
+
 ADD entrypoint.sh /entrypoint.sh
 
 # Default port for NameNode / ResourceManager / MapReduce JobHistory Server
