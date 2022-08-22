@@ -109,21 +109,31 @@ openldap:
     ingress:
       enabled: true
       hostname: phpldapadmin.demo.com
+
+## @section Hadoop parameters
 hadoop:
+  ## @section hadoop.enabled enable the hadoop components on the platfrom
   enabled: true
   conf:
+    ## @param hadoop.conf.coreSite will append the key and value to the core-site.xml file
     coreSite:
+      # defined the Unix user[hue] that will run the hue supervisor server as a proxyuser. ref: https://docs.gethue.com/administrator/configuration/connectors/#hdfs
       hadoop.proxyuser.hue.hosts: "*"
       hadoop.proxyuser.hue.groups: "*"
+      # defined the Unix user[httpfs] that will run the HttpFS server as a proxyuser. ref: https://hadoop.apache.org/docs/stable/hadoop-hdfs-httpfs/ServerSetup.html
+      hadoop.proxyuser.httpfs.hosts: "*"
+      hadoop.proxyuser.httpfs.groups: "*"
+      # defined the Unix user[hive] that will run the HiveServer2 server as a proxyuser. ref: https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/Superusers.html
+      hadoop.proxyuser.hive.hosts: "*"
+      hadoop.proxyuser.hive.groups: "*"
     hdfsSite:
       dfs.permissions.enabled: false
       dfs.webhdfs.enable: true
       dfs.replication: 3
     httpfsSite:
+      # Hue HttpFS proxy user setting. ref: https://docs.gethue.com/administrator/configuration/connectors/#hdfs
       httpfs.proxyuser.hue.hosts: "*"
       httpfs.proxyuser.hue.groups: "*"
-      hadoop.proxyuser.httpfs.hosts: "*"
-      hadoop.proxyuser.httpfs.groups: "*"
   ingress:
     nameNode:
       enabled: true
