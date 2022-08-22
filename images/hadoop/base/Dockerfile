@@ -24,7 +24,6 @@ RUN curl https://dist.apache.org/repos/dist/release/hadoop/common/KEYS | gpg --i
     && gpg --verify /tmp/hadoop.tar.gz.asc \
     && tar -xvf /tmp/hadoop.tar.gz -C /opt/ --exclude=hadoop-$HADOOP_VERSION/share/doc --exclude=hadoop-$HADOOP_VERSION/share/doc --exclude='*.cmd'\
     && ln -s /opt/hadoop-$HADOOP_VERSION $HADOOP_HOME \
-    && mkdir $HADOOP_HOME/logs \
     && ln -s $HADOOP_HOME/etc/hadoop /etc/hadoop \
     && rm /tmp/hadoop.tar.gz*
 
