@@ -115,7 +115,6 @@ hadoop:
     coreSite:
       hadoop.proxyuser.hue.hosts: "*"
       hadoop.proxyuser.hue.groups: "*"
-
     hdfsSite:
       dfs.permissions.enabled: false
       dfs.webhdfs.enable: true

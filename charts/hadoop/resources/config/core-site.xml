@@ -5,14 +5,6 @@
         <name>fs.defaultFS</name>
         <value>hdfs://{{ include "hadoop.fullname" . }}-namenode:{{ .Values.nameNode.port }}/</value>
     </property>
-    <property>
-        <name>hadoop.proxyuser.hdfs.hosts</name>
-        <value>*</value>
-    </property>
-    <property>
-        <name>hadoop.proxyuser.hdfs.groups</name>
-        <value>*</value>
-    </property>
     
     {{- range $key, $value := index .Values.conf "coreSite" }}
     <property>

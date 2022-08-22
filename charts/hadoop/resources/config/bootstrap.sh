@@ -10,9 +10,9 @@ CONFIG_DIR="/tmp/hadoop-config"
 # Copy config files from volume mount
 for f in slaves core-site.xml hdfs-site.xml mapred-site.xml yarn-site.xml httpfs-site.xml; do
     if [[ -e ${CONFIG_DIR}/$f ]]; then
-    cp ${CONFIG_DIR}/$f $HADOOP_HOME/etc/hadoop/$f
+      cp ${CONFIG_DIR}/$f $HADOOP_HOME/etc/hadoop/$f
     else
-    echo "ERROR: Could not find $f in $CONFIG_DIR"
+      echo "ERROR: Could not find $f in $CONFIG_DIR"
     exit 1
     fi
 done
@@ -39,8 +39,8 @@ fi
 # Start RESOURCE MANAGER and PROXY SERVER as daemons
 # ------------------------------------------------------
 if [[ $2 == "resourcemanager" ]]; then
-$HADOOP_HOME/bin/yarn --loglevel {{ .Values.logLevel }} --daemon start resourcemanager
-$HADOOP_HOME/bin/yarn --loglevel {{ .Values.logLevel }} --daemon start proxyserver
+  $HADOOP_HOME/bin/yarn --loglevel {{ .Values.logLevel }} --daemon start resourcemanager
+  $HADOOP_HOME/bin/yarn --loglevel {{ .Values.logLevel }} --daemon start proxyserver
 fi
 # ------------------------------------------------------
 # Start NODE MANAGER
@@ -61,7 +61,7 @@ fi
 # ------------------------------------------------------
 if [[ $2 == "historyserver" ]]; then
   if timeout 5m bash -c "until nc -vz {{ include "hadoop.fullname" . }}-namenode {{ .Values.nameNode.port }} -w2; do echo Waiting for namenode; sleep 5; done"; then
-  $HADOOP_HOME/bin/mapred  --loglevel {{ .Values.logLevel }} --daemon start historyserver
+    $HADOOP_HOME/bin/mapred  --loglevel {{ .Values.logLevel }} --daemon start historyserver
   else
     echo "$0: Timeout waiting for namenode, exiting."
     exit 1
