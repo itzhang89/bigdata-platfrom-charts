@@ -12,7 +12,7 @@ ENV HADOOP_CONF_DIR /etc/hadoop
 USER root
 
 # install extra packages
-RUN softwares='curl netcat gnupg' \
+RUN softwares='curl netcat gnupg procps' \
     && apt-get update && apt-get install -y $softwares --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
