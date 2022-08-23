@@ -257,7 +257,8 @@ hue:
     zz_hue_ini: |
       [desktop]
       secret_key=hue123
-      app_blacklist=spark,zookeeper,hbase,impala,search,pig,sqoop,security
+      # ref: https://gethue.com/mini-how-to-disabling-some-apps-from-showing-up/
+      app_blacklist=spark,zookeeper,hbase,impala,search,pig,sqoop,security,oozie,jobsub,jobbrowser
       django_debug_mode=false
       gunicorn_work_class=sync
       enable_prometheus=true
@@ -320,11 +321,6 @@ hue:
       resourcemanager_port=8032
       history_server_api_url=http://{{ template "platform.hadoop" . }}-historyserver-hl:19888/
       spark_history_server_url=http://{{ template "platform.hadoop" . }}-spark-master-svc:18080
-
-  aws:
-    accessKeyId: ""
-    secretAccessKey: ""
-    awsRegion: "us-east-1"
 superset:
   ingress:
     enabled: true
