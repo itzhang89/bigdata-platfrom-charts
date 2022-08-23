@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-# install spark
+# install spark-with-hadoop. eg https://archive.apache.org/dist/spark/spark-3.2.1/spark-3.2.1-bin-hadoop3.2.tgz
 SPARK_VERSION=3.2.1
 cd /tmp &&
-  curl -fSLO https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-without-hadoop.tgz &&
-  tar -xvzf /tmp/spark-${SPARK_VERSION}-bin-without-hadoop.tgz -C /opt/soft &&
-  ln -s /opt/soft/spark-${SPARK_VERSION}-bin-without-hadoop /opt/soft/spark &&
-  rm -rf spark-${SPARK_VERSION}-bin-without-hadoop.tgz
+  curl -fSLO https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.2.tgz &&
+  tar -xvzf /tmp/spark-${SPARK_VERSION}-bin-hadoop3.2.tgz -C /opt/soft &&
+  ln -s /opt/soft/spark-${SPARK_VERSION}-bin-hadoop3.2 /opt/soft/spark &&
+  rm -rf spark-${SPARK_VERSION}-bin-hadoop3.2.tgz
 
 # install hadoop
 HADOOP_VERSION=3.2.3
@@ -23,6 +23,8 @@ cd /opt/soft/spark && cp ./conf/spark-env.sh.template ./conf/spark-env.sh
 
 sed -i '$a\export HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop' conf/spark-env.sh
 sed -i '$a\export YARN_CONF_DIR=${HADOOP_HOME}/etc/hadoop' conf/spark-env.sh
+# add the hadoop jars on the spark-without-hadoop version
+sed -i '$a\export SPARK_DIST_CLASSPATH=$(${HADOOP_HOME}/bin/hadoop classpath)' conf/spark-env.sh
 
 # 配置保证资源调度按照CPU + 内存模式
 sed -i 's|DefaultResourceCalculator|DominantResourceCalculator|g' /opt/soft/hadoop/etc/hadoop/capacity-scheduler.xml
@@ -75,4 +77,6 @@ sed -i '$a\spark.eventLog.enabled=true' /opt/soft/spark/conf/spark-defaults.conf
 sed -i '$a\spark.yarn.historyServer.address=http://my-platform-spark-master-svc:18080' /opt/soft/spark/conf/spark-defaults.conf
 
 # start the spark history server
-./sbin/start-history-server.sh
+mkdir -p /tmp/spark-events && ./sbin/start-history-server.sh
+
+# File does not exist: hdfs:/user/spark/applicationHistory
