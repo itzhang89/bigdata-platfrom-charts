@@ -143,6 +143,11 @@ hadoop:
       enabled: true
       hosts:
         - resourcemanager.demo.com
+  persistence:
+    nameNode:
+      enabled: true
+    dataNode:
+      enabled: true
 hive:
   enabled: true
   hive-metastore:
