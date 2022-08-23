@@ -24,7 +24,8 @@ if [[ $2 == "namenode" ]]; then
     mkdir -p /data/dfs/name && chown -R hdfs:hadoop /data/dfs && chmod g+s /data/dfs
     export HADOOP_LOG_DIR=/var/log/hadoop-hdfs
     mkdir -p $HADOOP_LOG_DIR && chown -R hdfs:hadoop $HADOOP_LOG_DIR && chmod g+s $HADOOP_LOG_DIR
-    su hdfs -c "$HADOOP_HOME/bin/hdfs namenode -format -force -nonInteractive"
+    # format the namenode if not formated
+    [[ ! -f /data/dfs/name/current/VERSION ]] && su hdfs -c "$HADOOP_HOME/bin/hdfs namenode -format -force -nonInteractive"
     su hdfs -c "$HADOOP_HOME/sbin/hadoop-daemon.sh start namenode"
 fi
 
