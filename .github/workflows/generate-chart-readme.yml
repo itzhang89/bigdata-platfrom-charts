@@ -1,0 +1,55 @@
+name: '[Support] Update README metadata'
+
+on:
+  pull_request_target:
+    branches:
+      - master
+    paths:
+      - 'charts/*/values.yaml'
+      - 'values.yaml.template'
+      - 'README.md.gotmpl'
+env:
+  HELM_DOCS_VERSION: "1.11.0"
+jobs:
+  update-readme-metadata:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: install helm-docs
+        run: |
+          cd /tmp
+          wget https://github.com/norwoodj/helm-docs/releases/download/v${{env.HELM_DOCS_VERSION}}/helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
+          tar -xvf helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
+          sudo mv helm-docs /usr/local/sbin
+
+      - name: Checkout yutianaiqingtian/bigdata-platfrom-charts
+        uses: actions/checkout@v3
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Execute helm-docs
+        run: |
+          # Using the Github API to detect the files changed as git merge-base stops working when the branch is behind
+          # and jitterbit/get-changed-files does not support pull_request_target
+          URL="https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files"
+          files_changed_data=$(curl -s --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -X GET -G "$URL")
+          files_changed="$(echo $files_changed_data | jq -r '.[] | .filename')"
+          # Adding || true to avoid "Process exited with code 1" errors
+          charts_dirs_changed="$(echo "$files_changed" | grep -o "charts/[^/]*/values.yaml" | xargs dirname | sort | uniq || true)"
+          for chart in ${charts_dirs_changed}; do
+            echo "Updating README.md for ${chart}"
+            cp -f ./README.md.gotmpl ${chart}
+            helm-docs -c "${chart}"
+            rm ${chart}/README.md.gotmpl
+          done
+      - name: Push changes
+        run: |
+          # Push all the changes
+          cd charts
+          if git status -s | grep README.md; then
+            git config user.name "$GITHUB_ACTOR"
+            git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+            git add . && git commit -am "Update README.md with helm-dosc" --signoff && git push
+          fi
