@@ -12,7 +12,7 @@ ENV HADOOP_CONF_DIR /etc/hadoop
 USER root
 
 # install extra packages
-RUN softwares='curl netcat gnupg' \
+RUN softwares='curl netcat gnupg procps' \
     && apt-get update && apt-get install -y $softwares --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -24,7 +24,6 @@ RUN curl https://dist.apache.org/repos/dist/release/hadoop/common/KEYS | gpg --i
     && gpg --verify /tmp/hadoop.tar.gz.asc \
     && tar -xvf /tmp/hadoop.tar.gz -C /opt/ --exclude=hadoop-$HADOOP_VERSION/share/doc --exclude=hadoop-$HADOOP_VERSION/share/doc --exclude='*.cmd'\
     && ln -s /opt/hadoop-$HADOOP_VERSION $HADOOP_HOME \
-    && mkdir $HADOOP_HOME/logs \
     && ln -s $HADOOP_HOME/etc/hadoop /etc/hadoop \
     && rm /tmp/hadoop.tar.gz*
 

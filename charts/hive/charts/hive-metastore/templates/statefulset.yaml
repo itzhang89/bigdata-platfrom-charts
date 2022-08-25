@@ -27,6 +27,8 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         command:
           - /usr/local/bin/startup-metastore.sh
+        securityContext:
+          runAsUser: 971
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         volumeMounts:

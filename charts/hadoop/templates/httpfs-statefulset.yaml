@@ -1,7 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "hadoop.fullname" . }}-httpfs
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/hadoop-configmap.yaml") . | sha256sum }}
   labels:
     app.kubernetes.io/name: {{ include "hadoop.name" . }}
     app.kubernetes.io/component: httpfs
@@ -13,6 +15,7 @@ spec:
       app.kubernetes.io/name: {{ include "hadoop.name" . }}
       app.kubernetes.io/component: httpfs
       app.kubernetes.io/instance: {{ .Release.Name | quote }}
+  serviceName: {{ include "hadoop.fullname" . }}-namenode
   template:
     metadata:
       labels:
@@ -32,19 +35,21 @@ spec:
           - name: CATALINA_OPTS
             value: -Dhttpfs.admin.hostname=0.0.0.0
         command:
-        - "/opt/hadoop/sbin/httpfs.sh"
-        - "run"
+        - "/bin/bash"
+        - "/tmp/hadoop-config/bootstrap.sh"
+        - "-d"
+        - "httpfs"
         resources:
 {{ toYaml .Values.nameNode.resources | indent 10 }}
-        #livenessProbe:
-        #  httpGet:
-        #    path: /
-        #    port: {{ .Values.nameNode.httpPort }}
-        #  initialDelaySeconds: 10
-        #  timeoutSeconds: 2
+        readinessProbe:
+          httpGet:
+            path: /webhdfs/v1?op=gethomedirectory&user.name=hdfs
+            port: {{ .Values.httpfs.port }}
+          initialDelaySeconds: 10
+          timeoutSeconds: 2
         volumeMounts:
         - name: hadoop-config
-          mountPath: /opt/hadoop/etc/hadoop
+          mountPath: /tmp/hadoop-config
       volumes:
       - name: hadoop-config
         configMap:

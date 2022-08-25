@@ -10,4 +10,4 @@ HADOOP_USER_NAME={{ .Values.conf.hdfsAdminUser }} hdfs dfs -chmod g+w /tmp
 HADOOP_USER_NAME={{ .Values.conf.hdfsAdminUser }} hdfs dfs -chmod g+w /user/hive/warehouse
 HADOOP_USER_NAME={{ .Values.conf.hdfsAdminUser }} hdfs dfs -chown hive:hive /user/hive/warehouse
 
-$HIVE_HOME/bin/hiveserver2 --hiveconf hive.server2.enable.doAs=false --hiveconf hive.root.logger={{ .Values.conf.logLevel }},console
+su hive -c "$HIVE_HOME/bin/hiveserver2 --hiveconf hive.root.logger={{ .Values.conf.logLevel }},console"

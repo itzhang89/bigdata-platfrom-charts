@@ -44,22 +44,6 @@ spec:
                   app.kubernetes.io/component: datanode
                   {{- include "hadoop.labels" . | nindent 18 }}
         {{- end }}
-      securityContext:
-        fsGroup: 114
-#      initContainers:
-#      - name: "chown"
-#        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-#        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-#        command:
-#        - /bin/bash
-#        - -c
-#        - chown -R hdfs:hadoop /data/dfs &&
-#          chmod g+s /data/dfs
-#        securityContext:
-#          runAsUser: 0
-#        volumeMounts:
-#        - mountPath: /data/dfs
-#          name: dfs
       containers:
       - name: datanode
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

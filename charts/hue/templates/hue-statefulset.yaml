@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "hue.fullname" . }}
   labels:
@@ -13,6 +13,7 @@ spec:
       app.kubernetes.io/component: hue
       app.kubernetes.io/instance: {{ .Release.Name | quote }}
   replicas: {{ .Values.hue.replicas }}
+  serviceName: {{ include "hue.fullname" . }}
   template:
     metadata:
       labels:

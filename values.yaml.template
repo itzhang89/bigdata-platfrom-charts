@@ -109,22 +109,31 @@ openldap:
     ingress:
       enabled: true
       hostname: phpldapadmin.demo.com
+
+## @section Hadoop parameters
 hadoop:
+  ## @section hadoop.enabled enable the hadoop components on the platfrom
   enabled: true
   conf:
+    ## @param hadoop.conf.coreSite will append the key and value to the core-site.xml file
     coreSite:
+      # defined the Unix user[hue] that will run the hue supervisor server as a proxyuser. ref: https://docs.gethue.com/administrator/configuration/connectors/#hdfs
       hadoop.proxyuser.hue.hosts: "*"
       hadoop.proxyuser.hue.groups: "*"
-
+      # defined the Unix user[httpfs] that will run the HttpFS server as a proxyuser. ref: https://hadoop.apache.org/docs/stable/hadoop-hdfs-httpfs/ServerSetup.html
+      hadoop.proxyuser.httpfs.hosts: "*"
+      hadoop.proxyuser.httpfs.groups: "*"
+      # defined the Unix user[hive] that will run the HiveServer2 server as a proxyuser. ref: https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/Superusers.html
+      hadoop.proxyuser.hive.hosts: "*"
+      hadoop.proxyuser.hive.groups: "*"
     hdfsSite:
       dfs.permissions.enabled: false
       dfs.webhdfs.enable: true
       dfs.replication: 3
     httpfsSite:
+      # Hue HttpFS proxy user setting. ref: https://docs.gethue.com/administrator/configuration/connectors/#hdfs
       httpfs.proxyuser.hue.hosts: "*"
       httpfs.proxyuser.hue.groups: "*"
-      hadoop.proxyuser.httpfs.hosts: "*"
-      hadoop.proxyuser.httpfs.groups: "*"
   ingress:
     nameNode:
       enabled: true
@@ -134,6 +143,11 @@ hadoop:
       enabled: true
       hosts:
         - resourcemanager.demo.com
+  persistence:
+    nameNode:
+      enabled: true
+    dataNode:
+      enabled: true
 hive:
   enabled: true
   hive-metastore:
@@ -150,6 +164,7 @@ hive:
     hiveSite:
       hive.metastore.warehouse.dir: hdfs://$releaseName-hadoop-namenode:9820/user/hive/warehouse
       hive.metastore.schema.verification: false
+    hadoopConfigMap: $releaseName-hadoop-hadoop
 spark:
   enabled: true
   ingress:
@@ -247,7 +262,8 @@ hue:
     zz_hue_ini: |
       [desktop]
       secret_key=hue123
-      app_blacklist=spark,zookeeper,hbase,impala,search,pig,sqoop,security
+      # ref: https://gethue.com/mini-how-to-disabling-some-apps-from-showing-up/
+      app_blacklist=spark,zookeeper,hbase,impala,search,pig,sqoop,security,oozie,jobsub,jobbrowser
       django_debug_mode=false
       gunicorn_work_class=sync
       enable_prometheus=true
@@ -284,7 +300,7 @@ hue:
 
       [beeswax]
       # Host where HiveServer2 is running.
-      hive_server_host=$releaseName-hive-HiveServer
+      hive_server_host=$releaseName-hive-hiveserver
       # Port where HiveServer2 Thrift server runs on.
       hive_server_port=10000
       thrift_version=7
@@ -310,11 +326,6 @@ hue:
       resourcemanager_port=8032
       history_server_api_url=http://{{ template "platform.hadoop" . }}-historyserver-hl:19888/
       spark_history_server_url=http://{{ template "platform.hadoop" . }}-spark-master-svc:18080
-
-  aws:
-    accessKeyId: ""
-    secretAccessKey: ""
-    awsRegion: "us-east-1"
 superset:
   ingress:
     enabled: true

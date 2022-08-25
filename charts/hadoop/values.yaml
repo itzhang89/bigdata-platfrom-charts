@@ -1,8 +1,8 @@
 # The base hadoop image to use for all components.
 # See this repo for image build details: https://github.com/Comcast/kube-yarn/tree/master/image
 image:
-  repository: 5200710/hadoop:3.2.3-java8
-  tag: 3.2.3
+  repository: 5200710/hadoop
+  tag: 3.2.3-java8
   pullPolicy: IfNotPresent
 
 # Select antiAffinity as either hard or soft, default is 'soft'

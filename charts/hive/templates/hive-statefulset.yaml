@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "hive.fullname" . }}-HiveServer
+  name: {{ include "hive.fullname" . }}-hiveserver
   labels:
     app.kubernetes.io/name: {{ include "hive.name" . }}
     app.kubernetes.io/component: server

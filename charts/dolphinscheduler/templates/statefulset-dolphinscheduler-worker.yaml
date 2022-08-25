@@ -26,7 +26,7 @@ spec:
   selector:
     matchLabels:
       {{- include "dolphinscheduler.worker.labels" . | nindent 6 }}
-  serviceName: {{ template "dolphinscheduler.fullname" . }}-worker-headless
+  serviceName: {{ template "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-headless
   template:
     metadata:
       labels:
