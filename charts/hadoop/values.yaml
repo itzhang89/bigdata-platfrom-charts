@@ -1,11 +1,11 @@
 # The base hadoop image to use for all components.
 
-# -- image.repository hadoop Docker image repository
-# -- image.tag Global hadoop Docker image tag
-# -- image.pullPolicy hadoop Docker image pullPolicy
 image:
+  # -- hadoop Docker image repository. eg. [Docker Hub| Hadoop ](https://hub.docker.com/repository/docker/5200710/hadoop)
   repository: 5200710/hadoop
+  # -- hadoop Docker image tag
   tag: 3.2.3-java8
+  # -- hadoop Docker image pullPolicy
   pullPolicy: IfNotPresent
 
 # Select antiAffinity as either hard or soft, default is 'soft'
@@ -13,15 +13,19 @@ image:
 antiAffinity: "soft"
 logLevel: INFO
 
-# -- conf.coreSite all of the configure will take effect in the core-site.xml file
 conf:
+  # -- conf.coreSite this configuration will take effect in the core-site.xml file
   coreSite:
   # fs.trash.interval: "10080"  # trash auto purge in minutes
+  # -- conf.hdfsSite this configuration will take effect in the hdfs-site.xml file
   hdfsSite:
     dfs.replication: 3  # when changing this value ensure that dataNode.replicas is equal or higher than this value
     # dfs.datanode.du.reserved: "4294967296"  # number of bytes to reserve on disk to block hitting disk full, must be quoted for large numbers, because of gotemplate converting large numbers to float with scientific notation
+  # -- conf.httpfsSite this configuration will take effect in the httpfs-site.xml file
   httpfsSite: { }
+  # -- conf.yarnSite this configuration will take effect in the yarn-site.xml file
   yarnSite: { }
+  # -- conf.mapredSite this configuration will take effect in the mapred-site.xml file
   mapredSite: { }
 
 # httpsfs service
@@ -50,8 +54,10 @@ nameNode:
       cpu: "1000m"
 
 dataNode:
-  replicas: 3  # ensure this value is higher or equal to 'conf.hdfsSite.dfs.replication'
-  pdbMinAvailable: 3  # ensure to set this value before deploying
+  # -- ensure this value is higher or equal to 'conf.hdfsSite.dfs.replication'
+  replicas: 3
+  # --  ensure to set this value before deploying
+  pdbMinAvailable: 3
   port: 9867
   httpPort: 9864
   httpsPort: 9865
@@ -100,7 +106,7 @@ nodemanager:
 historyserver:
   enabled: true
   replicas: 1
-  # historyserver container port. Default HTTP port is 19888.
+  # -- historyserver container port. Default HTTP port is 19888.
   port: 19888
   pdbMinAvailable: 1
   service:
@@ -201,10 +207,10 @@ persistence:
 ## ------------------------------------------------------
 
 ## Prometheus Exporter Configuration
-## ref: https://prometheus.io/docs/instrumenting/exporters/
+## -- ref: https://prometheus.io/docs/instrumenting/exporters/
 prometheus:
   ## Exporter Configuration
-  ## ref: https://github.com/marcelmay/hadoop-hdfs-fsimage-exporter
+  ## -- ref: https://github.com/marcelmay/hadoop-hdfs-fsimage-exporter
   exporter:
     image:
       repository: marcelmay/hadoop-hdfs-fsimage-exporter
