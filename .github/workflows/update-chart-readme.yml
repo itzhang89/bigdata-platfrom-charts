@@ -5,9 +5,18 @@ on:
     branches:
       - master
     paths:
-      - 'charts/*/values.yaml'
-      - 'values.yaml.template'
-      - 'README.md.gotmpl'
+      - charts/**/values.yaml
+      - values.yaml.template
+      - README.md.gotmpl
+    types:
+      - closed
+  push:
+    branches:
+      - master
+    paths:
+      - charts/**/values.yaml
+      - values.yaml.template
+      - README.md.gotmpl
 env:
   HELM_DOCS_VERSION: "1.11.0"
 jobs:
@@ -25,17 +34,11 @@ jobs:
       - name: Checkout yutianaiqingtian/bigdata-platfrom-charts
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
 
-      - name: Execute helm-docs
+      - name: List all changed files
         run: |
-          # Using the Github API to detect the files changed as git merge-base stops working when the branch is behind
-          # and jitterbit/get-changed-files does not support pull_request_target
-          URL="https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files"
-          files_changed_data=$(curl -s --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -X GET -G "$URL")
-          files_changed="$(echo $files_changed_data | jq -r '.[] | .filename')"
-          # Adding || true to avoid "Process exited with code 1" errors
-          charts_dirs_changed="$(echo "$files_changed" | grep -o "charts/[^/]*/values.yaml" | xargs dirname | sort | uniq || true)"
+          charts_dirs_changed="$(echo ${{ steps.changed-files.outputs.all_changed_files }} | grep -o "charts/[^/]*/values.yaml" | xargs dirname | sort | uniq || true)"
           for chart in ${charts_dirs_changed}; do
             echo "Updating README.md for ${chart}"
             cp -f ./README.md.gotmpl ${chart}
@@ -49,5 +52,5 @@ jobs:
           if git status -s | grep README.md; then
             git config user.name "$GITHUB_ACTOR"
             git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-            git add . && git commit -am "Update README.md with helm-dosc" --signoff && git push
+            git add --update && git commit -am "Update README.md with helm-dosc" --signoff && git push
           fi
