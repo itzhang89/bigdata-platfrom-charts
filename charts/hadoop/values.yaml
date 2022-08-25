@@ -1,5 +1,8 @@
 # The base hadoop image to use for all components.
-# See this repo for image build details: https://github.com/Comcast/kube-yarn/tree/master/image
+
+# -- image.repository hadoop Docker image repository
+# -- image.tag Global hadoop Docker image tag
+# -- image.pullPolicy hadoop Docker image pullPolicy
 image:
   repository: 5200710/hadoop
   tag: 3.2.3-java8
