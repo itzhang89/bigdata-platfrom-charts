@@ -1,28 +1,30 @@
-# hdfs
+# hadoop
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![AppVersion: 3.2.2](https://img.shields.io/badge/AppVersion-3.2.2-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![AppVersion: 3.2.3](https://img.shields.io/badge/AppVersion-3.2.3-informational?style=flat-square)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/bigdata-charts)](https://artifacthub.io/packages/helm/bigdata-charts/hadoop)
 
 The Apache Hadoop software library is a framework that allows for the distributed processing of large data sets across clusters of computers using simple programming models.
 
-**Homepage:** <https://hadoop.apache.org/>
+## Installing the Chart
 
-## Maintainers
+To install the chart with the release name `my-release`:
 
-| Name | Email | Url |
-| ---- | ------ | --- |
-| itzhang89 | itzhang89@163.com |  |
+```console
+$ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
+$ helm upgrade --install my-release yutianaiqingtian/hadoop
+```
+To uninstall the release
 
-## Source Code
-
-* <https://github.com/apache/hadoop>
+```console
+$ helm delete my-release
+```
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | antiAffinity | string | `"soft"` |  |
-| conf.coreSite | string | `nil` |  |
-| conf.hdfsSite."dfs.replication" | int | `3` |  |
+| conf | object | `{"coreSite":null,"hdfsSite":{"dfs.replication":3},"httpfsSite":{},"mapredSite":{},"yarnSite":{}}` | conf.coreSite all of the configure will take effect in the core-site.xml file |
 | dataNode.httpPort | int | `9864` |  |
 | dataNode.httpsPort | int | `9865` |  |
 | dataNode.pdbMinAvailable | int | `3` |  |
@@ -32,16 +34,28 @@ The Apache Hadoop software library is a framework that allows for the distribute
 | dataNode.resources.limits.memory | string | `"2048Mi"` |  |
 | dataNode.resources.requests.cpu | string | `"10m"` |  |
 | dataNode.resources.requests.memory | string | `"256Mi"` |  |
+| historyserver.enabled | bool | `true` |  |
+| historyserver.pdbMinAvailable | int | `1` |  |
+| historyserver.port | int | `19888` |  |
+| historyserver.replicas | int | `1` |  |
+| historyserver.service.annotations | object | `{}` |  |
+| historyserver.service.loadBalancerIP | string | `nil` |  |
+| historyserver.service.port | int | `80` |  |
+| historyserver.service.type | string | `"ClusterIP"` |  |
 | httpfs.adminPort | int | `14001` |  |
 | httpfs.port | int | `14000` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"gradiant/hdfs"` |  |
-| image.tag | string | `"3.2.2"` |  |
+| image | object | `{"pullPolicy":"IfNotPresent","repository":"5200710/hadoop","tag":"3.2.3-java8"}` | image.pullPolicy hadoop Docker image pullPolicy |
 | ingress.dataNode.annotations | object | `{}` |  |
 | ingress.dataNode.enabled | bool | `false` |  |
 | ingress.dataNode.hosts[0] | string | `"hdfs-datanode.local"` |  |
 | ingress.dataNode.labels | object | `{}` |  |
 | ingress.dataNode.path | string | `"/"` |  |
+| ingress.historyserver.annotations | object | `{}` |  |
+| ingress.historyserver.enabled | bool | `false` |  |
+| ingress.historyserver.hosts[0] | string | `"historyserver.local"` |  |
+| ingress.historyserver.path | string | `"/"` |  |
+| ingress.historyserver.pathType | string | `"ImplementationSpecific"` |  |
+| ingress.historyserver.tls | list | `[]` |  |
 | ingress.httpfs.annotations | object | `{}` |  |
 | ingress.httpfs.enabled | bool | `false` |  |
 | ingress.httpfs.hosts[0] | string | `"httpfs.local"` |  |
@@ -52,6 +66,15 @@ The Apache Hadoop software library is a framework that allows for the distribute
 | ingress.nameNode.hosts[0] | string | `"hdfs-namenode.local"` |  |
 | ingress.nameNode.labels | object | `{}` |  |
 | ingress.nameNode.path | string | `"/"` |  |
+| ingress.nameNode.pathType | string | `"ImplementationSpecific"` |  |
+| ingress.nameNode.tls | list | `[]` |  |
+| ingress.resourcemanager.annotations | object | `{}` |  |
+| ingress.resourcemanager.enabled | bool | `false` |  |
+| ingress.resourcemanager.hosts[0] | string | `"yarn.local"` |  |
+| ingress.resourcemanager.path | string | `"/"` |  |
+| ingress.resourcemanager.pathType | string | `"ImplementationSpecific"` |  |
+| ingress.resourcemanager.tls | list | `[]` |  |
+| logLevel | string | `"INFO"` |  |
 | nameNode.httpPort | int | `9870` |  |
 | nameNode.httpsPort | int | `9871` |  |
 | nameNode.pdbMinAvailable | int | `1` |  |
@@ -60,6 +83,19 @@ The Apache Hadoop software library is a framework that allows for the distribute
 | nameNode.resources.limits.memory | string | `"2048Mi"` |  |
 | nameNode.resources.requests.cpu | string | `"10m"` |  |
 | nameNode.resources.requests.memory | string | `"256Mi"` |  |
+| nameNode.service.annotations | object | `{}` |  |
+| nameNode.service.loadBalancerIP | string | `nil` |  |
+| nameNode.service.port | int | `80` |  |
+| nameNode.service.type | string | `"ClusterIP"` |  |
+| nodemanager.httpPort | int | `8042` |  |
+| nodemanager.httpsPort | int | `443` |  |
+| nodemanager.pdbMinAvailable | int | `3` |  |
+| nodemanager.port | int | `8088` |  |
+| nodemanager.replicas | int | `3` |  |
+| nodemanager.resources.limits.cpu | string | `"4000m"` |  |
+| nodemanager.resources.limits.memory | string | `"8192Mi"` |  |
+| nodemanager.resources.requests.cpu | string | `"4000m"` |  |
+| nodemanager.resources.requests.memory | string | `"8192Mi"` |  |
 | persistence.dataNode.accessMode | string | `"ReadWriteOnce"` |  |
 | persistence.dataNode.enabled | bool | `false` |  |
 | persistence.dataNode.size | string | `"200Gi"` |  |
@@ -69,8 +105,23 @@ The Apache Hadoop software library is a framework that allows for the distribute
 | persistence.nameNode.size | string | `"50Gi"` |  |
 | persistence.nameNode.storageClass | string | `nil` |  |
 | prometheus.exporter.enabled | bool | `true` |  |
-| prometheus.exporter.image | string | `"marcelmay/hadoop-hdfs-fsimage-exporter:1.2"` |  |
+| prometheus.exporter.image.pullPolicy | string | `"IfNotPresent"` |  |
+| prometheus.exporter.image.repository | string | `"marcelmay/hadoop-hdfs-fsimage-exporter"` |  |
+| prometheus.exporter.image.tag | float | `1.3` |  |
 | prometheus.exporter.port | int | `5556` |  |
+| resourcemanager.httpPort | int | `80` |  |
+| resourcemanager.httpsPort | int | `443` |  |
+| resourcemanager.pdbMinAvailable | int | `1` |  |
+| resourcemanager.port | int | `8088` |  |
+| resourcemanager.replicas | int | `1` |  |
+| resourcemanager.resources.limits.cpu | string | `"2000m"` |  |
+| resourcemanager.resources.limits.memory | string | `"4096Mi"` |  |
+| resourcemanager.resources.requests.cpu | string | `"500m"` |  |
+| resourcemanager.resources.requests.memory | string | `"1024Mi"` |  |
+| resourcemanager.service.annotations | object | `{}` |  |
+| resourcemanager.service.loadBalancerIP | string | `nil` |  |
+| resourcemanager.service.port | int | `80` |  |
+| resourcemanager.service.type | string | `"ClusterIP"` |  |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.4.0](https://github.com/norwoodj/helm-docs/releases/v1.4.0)
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
