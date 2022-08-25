@@ -13,6 +13,7 @@ image:
 antiAffinity: "soft"
 logLevel: INFO
 
+# -- conf.coreSite all of the configure will take effect in the core-site.xml file
 conf:
   coreSite:
   # fs.trash.interval: "10080"  # trash auto purge in minutes
