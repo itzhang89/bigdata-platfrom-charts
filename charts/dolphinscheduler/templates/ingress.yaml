@@ -24,9 +24,9 @@ apiVersion: extensions/v1beta1
 {{- end }}
 kind: Ingress
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler
+  name: {{ include "dolphinscheduler.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
@@ -41,11 +41,11 @@ spec:
           backend:
             {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
             service:
-              name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
+              name: {{ include "dolphinscheduler.fullname" . }}-api
               port:
                 name: api-port
             {{- else }}
-            serviceName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
+            serviceName: {{ include "dolphinscheduler.fullname" . }}-api
             servicePort: api-port
             {{- end }}
           {{- if .Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
