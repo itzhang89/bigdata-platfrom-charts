@@ -19,6 +19,22 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+global:
+  postgresql:
+    auth:
+      ## @param auth.postgresPassword Password for the "postgres" admin user. Ignored if `auth.existingSecret` with key `postgres-password` is provided
+      ##
+      postgresPassword: "postgres"
+      ## @param auth.username Name for a custom user to create
+      ##
+      username: "dolphinscheduler"
+      ## @param auth.password Password for the custom user to create. Ignored if `auth.existingSecret` with key `password` is provided
+      ##
+      password: "Dolphinscheduler@2022"
+      ## @param auth.database Name for a custom database to create
+      ##
+      database: "dolphinscheduler"
+
 timezone: "Asia/Shanghai"
 
 image:
@@ -30,13 +46,22 @@ image:
 ## If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
   enabled: true
-  postgresqlUsername: "root"
-  postgresqlPassword: "root"
-  postgresqlDatabase: "dolphinscheduler"
-  persistence:
-    enabled: false
-    size: "20Gi"
-    storageClass: "-"
+  ## PostgreSQL Primary parameters
+  primary:
+    ##
+    ## Persistent Volume Storage configuration.
+    ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes
+    persistence:
+      ##
+      ## Enable PostgreSQL persistence using Persistent Volume Claims.
+      enabled: true
+      ##
+      ## Persistant class
+      # storageClass: classname
+      ##
+      ## Access modes:
+      accessModes:
+        - ReadWriteOnce
 
 ## If exists external database, and set postgresql.enable value to false.
 ## external database will be used, otherwise Dolphinscheduler's database will be used.
@@ -44,8 +69,8 @@ externalDatabase:
   type: "postgresql"
   host: "localhost"
   port: "5432"
-  username: "root"
-  password: "root"
+  username: "dolphinscheduler"
+  password: "Dolphinscheduler@2022"
   database: "dolphinscheduler"
   params: "characterEncoding=utf8"
 

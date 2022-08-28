@@ -122,19 +122,19 @@ Create a database environment variables.
 {{- define "dolphinscheduler.database.env_vars" -}}
 - name: DATABASE
   {{- if .Values.postgresql.enabled }}
-  value: "postgresql"
+  value: {{ .Values.global.postgresql.auth.database }}
   {{- else }}
   value: {{ .Values.externalDatabase.type | quote }}
   {{- end }}
 - name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
-  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?characterEncoding=utf8
+  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.global.postgresql.auth.database }}?characterEncoding=utf8
   {{- else }}
   value: jdbc:{{ .Values.externalDatabase.type }}://{{ .Values.externalDatabase.host }}:{{ .Values.externalDatabase.port }}/{{ .Values.externalDatabase.database }}?{{ .Values.externalDatabase.params }}
   {{- end }}
 - name: SPRING_DATASOURCE_USERNAME
   {{- if .Values.postgresql.enabled }}
-  value: {{ .Values.postgresql.postgresqlUsername }}
+  value: {{ .Values.global.postgresql.auth.username }}
   {{- else }}
   value: {{ .Values.externalDatabase.username | quote }}
   {{- end }}
@@ -143,7 +143,7 @@ Create a database environment variables.
     secretKeyRef:
       {{- if .Values.postgresql.enabled }}
       name: {{ template "dolphinscheduler.postgresql.fullname" . }}
-      key: postgresql-password
+      key: password
       {{- else }}
       name: {{ include "dolphinscheduler.fullname" . }}-externaldb
       key: database-password
