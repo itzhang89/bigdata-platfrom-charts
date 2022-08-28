@@ -3,3 +3,4 @@
 reports/
 /values.yaml
 /overwrite-values.yaml
+helmfile-*/
