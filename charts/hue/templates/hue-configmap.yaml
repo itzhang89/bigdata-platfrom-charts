@@ -8,15 +8,15 @@ data:
 
     [[database]]
     engine=postgresql_psycopg2
-    host={{ tpl .Values.postgresql.host . | default (printf "%s-postgres" (include "hue.fullname" .)) }}
-    port={{ .Values.postgresql.port }}
-    user={{ .Values.postgresql.auth.user }}
-{{- if .Values.postgresql.auth.password_script }}
-    password_script={{ .Values.postgresql.auth.password_script }}
+    host={{ tpl .Values.hue.connections.db_host . }}
+    port={{ .Values.hue.connections.db_port }}
+    user={{ .Values.hue.connections.db_user }}
+{{- if .Values.hue.connections.db_pass_script }}
+    password_script={{ .Values.hue.connections.db_pass_script }}
 {{- else }}
-    password={{ .Values.postgresql.auth.password }}
+    password={{ .Values.hue.connections.db_pass }}
 {{- end }}
-    name={{ .Values.postgresql.auth.database }}
+    name={{ .Values.hue.connections.db_user }}
 
     [aws]
     [[aws_accounts]]

@@ -28,19 +28,33 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+## Use the PostgreSQL chart dependency.
 postgresql:
-  name: postgresql
   enabled: true
-  host: ~
-  port: 5432
-  auth:
-    postgresPassword: "postgres"
-    database: "hue"
-    username: "hue"
-    password: "hue"
-    password_script: ~
+  global:
+    postgresql:
+      ## Set to false if bringing your own PostgreSQL.
+      ## Authentication parameters
+      auth:
+        ## The name of an existing secret that contains the postgres password.
+        postgresPassword: postgres
+        ## PostgreSQL name for a custom user to create
+        username: hue
+        ## PostgreSQL password for the custom user to create. Ignored if `auth.existingSecret` with key `password` is provided
+        password: hue
+        ## PostgreSQL name for a custom database to create
+        database: hue
+
 hue:
   replicas: 1
+  connections:
+    # You need to change below configuration incase bringing own PostgresSQL instance and also set postgresql.enabled:false
+    db_host: '{{ template "hue.fullname" . }}-postgresql'
+    db_port: "5432"
+    db_user: hue
+    db_pass: hue
+    db_name: hue
+    db_pass_script: ~
 #  interpreters: |-
 #    [[[postgresql]]]
 #    name = postgresql
