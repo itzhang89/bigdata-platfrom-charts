@@ -327,6 +327,8 @@ hue:
       history_server_api_url=http://{{ template "platform.hadoop" . }}-historyserver-hl:19888/
       spark_history_server_url=http://{{ template "platform.hadoop" . }}-spark-master-svc:18080
 superset:
+  image:
+    tag: 2.0.0
   ingress:
     enabled: true
     hosts:

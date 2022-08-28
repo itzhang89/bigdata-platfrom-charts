@@ -58,7 +58,7 @@ dependencies:
     version: ~1.0.3
     condition: hue.enabled
   - name: superset
-    version: ~0.6.3
+    version: ~0.7.1
     repository: https://apache.github.io/superset
     condition: superset.enabled
   - name: dolphinscheduler
