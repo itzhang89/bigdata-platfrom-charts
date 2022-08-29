@@ -56,10 +56,12 @@ find ${INSTALL_PATH} -depth \
   \) -exec rm -rf '{}' + \
   ;
 
+ln -s /opt/soft/Python-3.10.6 /opt/soft/python
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-/opt/soft/python/lib}
+
 ${INSTALL_PATH}/bin/python3 --version
 
 # make it work on you environment file
-ln -s /opt/soft/Python-3.10.6 /opt/soft/python
-export PYTHON_HOME=/opt/soft/python
-export PATH=$PYTHON_HOME/bin:$PATH
-ldconfig $PYTHON_HOME/lib
+#export PYTHON_HOME=/opt/soft/python
+#export PATH=$PYTHON_HOME/bin:$PATH
+#ldconfig $PYTHON_HOME/lib
