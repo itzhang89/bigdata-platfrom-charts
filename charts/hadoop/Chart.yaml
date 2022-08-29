@@ -10,5 +10,6 @@ maintainers:
   name: itzhang89
 name: hadoop
 sources:
-- https://github.com/apache/hadoop
+  - https://github.com/apache/hadoop
+  - https://github.com/yutianaiqingtian/bigdata-platfrom-charts
 version: 1.0.1

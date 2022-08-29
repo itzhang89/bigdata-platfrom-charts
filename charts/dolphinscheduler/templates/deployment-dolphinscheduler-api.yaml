@@ -17,7 +17,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
+  name: {{ include "dolphinscheduler.fullname" . }}-api
   labels:
     {{- include "dolphinscheduler.api.labels" . | nindent 4 }}
 spec:
@@ -56,7 +56,7 @@ spec:
       - name: {{ .Values.image.pullSecret }}
       {{- end }}
       containers:
-        - name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
+        - name: {{ include "dolphinscheduler.fullname" . }}-api
           image: {{ include "dolphinscheduler.image.fullname.api" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -78,7 +78,7 @@ spec:
             {{ end }}
           envFrom:
             - configMapRef:
-                name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-common
+                name: {{ include "dolphinscheduler.fullname" . }}-common
           {{- if .Values.api.resources }}
           resources:
             {{- toYaml .Values.api.resources | nindent 12 }}
@@ -105,22 +105,22 @@ spec:
           {{- end }}
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
-              name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
+              name: {{ include "dolphinscheduler.fullname" . }}-api
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
               subPath: common_properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
       volumes:
-        - name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
+        - name: {{ include "dolphinscheduler.fullname" . }}-api
           {{- if .Values.api.persistentVolumeClaim.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
+            claimName: {{ include "dolphinscheduler.fullname" . }}-api
           {{- else }}
           emptyDir: {}
           {{- end }}
         - name: config-volume
           configMap:
-            name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-configs
+            name: {{ include "dolphinscheduler.fullname" . }}-configs
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}

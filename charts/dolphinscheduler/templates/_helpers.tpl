@@ -58,7 +58,7 @@ app.kubernetes.io/version: {{ .Chart.AppVersion }}
 Create a master labels.
 */}}
 {{- define "dolphinscheduler.master.labels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
 app.kubernetes.io/component: master
 {{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
@@ -67,7 +67,7 @@ app.kubernetes.io/component: master
 Create a worker labels.
 */}}
 {{- define "dolphinscheduler.worker.labels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
 app.kubernetes.io/component: worker
 {{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
@@ -76,7 +76,7 @@ app.kubernetes.io/component: worker
 Create an alert labels.
 */}}
 {{- define "dolphinscheduler.alert.labels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-alert
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
 app.kubernetes.io/component: alert
 {{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
@@ -85,7 +85,7 @@ app.kubernetes.io/component: alert
 Create an api labels.
 */}}
 {{- define "dolphinscheduler.api.labels" -}}
-app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-api
+app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
 app.kubernetes.io/component: api
 {{ include "dolphinscheduler.common.labels" . }}
 {{- end -}}
@@ -122,19 +122,19 @@ Create a database environment variables.
 {{- define "dolphinscheduler.database.env_vars" -}}
 - name: DATABASE
   {{- if .Values.postgresql.enabled }}
-  value: "postgresql"
+  value: {{ .Values.global.postgresql.auth.database }}
   {{- else }}
   value: {{ .Values.externalDatabase.type | quote }}
   {{- end }}
 - name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
-  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?characterEncoding=utf8
+  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.global.postgresql.auth.database }}?characterEncoding=utf8
   {{- else }}
   value: jdbc:{{ .Values.externalDatabase.type }}://{{ .Values.externalDatabase.host }}:{{ .Values.externalDatabase.port }}/{{ .Values.externalDatabase.database }}?{{ .Values.externalDatabase.params }}
   {{- end }}
 - name: SPRING_DATASOURCE_USERNAME
   {{- if .Values.postgresql.enabled }}
-  value: {{ .Values.postgresql.postgresqlUsername }}
+  value: {{ .Values.global.postgresql.auth.username }}
   {{- else }}
   value: {{ .Values.externalDatabase.username | quote }}
   {{- end }}
@@ -143,9 +143,9 @@ Create a database environment variables.
     secretKeyRef:
       {{- if .Values.postgresql.enabled }}
       name: {{ template "dolphinscheduler.postgresql.fullname" . }}
-      key: postgresql-password
+      key: password
       {{- else }}
-      name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-externaldb
+      name: {{ include "dolphinscheduler.fullname" . }}-externaldb
       key: database-password
       {{- end }}
 {{- end -}}
@@ -191,7 +191,7 @@ Create a common fs_s3a environment variables.
   valueFrom:
     secretKeyRef:
       key: fs-s3a-secret-key
-      name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-fs-s3a
+      name: {{ include "dolphinscheduler.fullname" . }}-fs-s3a
 {{- end -}}
 {{- end -}}
 
@@ -200,9 +200,9 @@ Create a sharedStoragePersistence volume.
 */}}
 {{- define "dolphinscheduler.sharedStorage.volume" -}}
 {{- if .Values.common.sharedStoragePersistence.enabled -}}
-- name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-shared
+- name: {{ include "dolphinscheduler.fullname" . }}-shared
   persistentVolumeClaim:
-    claimName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-shared
+    claimName: {{ include "dolphinscheduler.fullname" . }}-shared
 {{- end -}}
 {{- end -}}
 
@@ -212,7 +212,7 @@ Create a sharedStoragePersistence volumeMount.
 {{- define "dolphinscheduler.sharedStorage.volumeMount" -}}
 {{- if .Values.common.sharedStoragePersistence.enabled -}}
 - mountPath: {{ .Values.common.sharedStoragePersistence.mountPath | quote }}
-  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-shared
+  name: {{ include "dolphinscheduler.fullname" . }}-shared
 {{- end -}}
 {{- end -}}
 
@@ -221,9 +221,9 @@ Create a fsFileResourcePersistence volume.
 */}}
 {{- define "dolphinscheduler.fsFileResource.volume" -}}
 {{- if .Values.common.fsFileResourcePersistence.enabled -}}
-- name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-fs-file
+- name: {{ include "dolphinscheduler.fullname" . }}-fs-file
   persistentVolumeClaim:
-    claimName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-fs-file
+    claimName: {{ include "dolphinscheduler.fullname" . }}-fs-file
 {{- end -}}
 {{- end -}}
 
@@ -233,6 +233,6 @@ Create a fsFileResourcePersistence volumeMount.
 {{- define "dolphinscheduler.fsFileResource.volumeMount" -}}
 {{- if .Values.common.fsFileResourcePersistence.enabled -}}
 - mountPath: {{ default "/dolphinscheduler" .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
-  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-fs-file
+  name: {{ include "dolphinscheduler.fullname" . }}-fs-file
 {{- end -}}
 {{- end -}}

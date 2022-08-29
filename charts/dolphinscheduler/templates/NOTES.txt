@@ -25,14 +25,14 @@ Access DolphinScheduler UI URL by:
 
 {{- else if eq .Values.api.service.type "ClusterIP" }}
 
-  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-dolphinscheduler-api 12345:12345
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-api 12345:12345
 
   DolphinScheduler UI URL: http://127.0.0.1:12345/dolphinscheduler
 
 {{- else if eq .Values.api.service.type "NodePort" }}
 
   NODE_IP=$(kubectl get no -n {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  NODE_PORT=$(kubectl get svc {{ template "dolphinscheduler.fullname" . }}-dolphinscheduler-api -n {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}")
+  NODE_PORT=$(kubectl get svc {{ template "dolphinscheduler.fullname" . }}-api -n {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}")
   echo http://$NODE_IP:$NODE_PORT/dolphinscheduler
 
   DolphinScheduler UI URL: http://$NODE_IP:$NODE_PORT/dolphinscheduler
@@ -40,9 +40,9 @@ Access DolphinScheduler UI URL by:
 {{- else if eq .Values.api.service.type "LoadBalancer" }}
 
   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-        You can watch the status of by running 'kubectl get svc {{ template "dolphinscheduler.fullname" . }}-dolphinscheduler-api -n {{ .Release.Namespace }} -w'
+        You can watch the status of by running 'kubectl get svc {{ template "dolphinscheduler.fullname" . }}-api -n {{ .Release.Namespace }} -w'
 
-  SERVICE_IP=$(kubectl get svc {{ template "dolphinscheduler.fullname" . }}-dolphinscheduler-api -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  SERVICE_IP=$(kubectl get svc {{ template "dolphinscheduler.fullname" . }}-api -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
   echo http://$SERVICE_IP:12345/dolphinscheduler
 
   DolphinScheduler UI URL: http://$SERVICE_IP:12345/dolphinscheduler
