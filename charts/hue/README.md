@@ -1,70 +1,57 @@
-# Hue Chart
+# hue
 
-This is an Helm chart to easily start a Hue service.
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/hue)](https://artifacthub.io/packages/helm/bigdata-charts/hue) ![Version: 1.0.4](https://img.shields.io/badge/Version-1.0.4-informational?style=flat-square) ![AppVersion: 4.10.0](https://img.shields.io/badge/AppVersion-4.10.0-informational?style=flat-square)
 
+Hue is an SQL Cloud Editor for Data Warehouses and Databases.
 
-## Install
+## Installing the Chart
 
-    cd tools/kubernetes/helm/hue
+To install the chart with the release name `my-hue`:
 
-View the configuration [values.yaml](values.yaml), edit if needed and run:
+```console
+$ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
+$ helm upgrade --install my-hue yutianaiqingtian/hue --version 1.0.4
+```
+To uninstall the release
 
-    helm install hue hue
+```console
+$ helm delete my-hue
+```
 
-[values.yaml](values.yaml) contains the most important parameters in the `hue` section with for example which database to use. The `ini`
-section let you add any extra [regular parameter](https://docs.gethue.com//administrator/configuration/server/).
+## Values
 
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| aws.accessKeyId | string | `""` |  |
+| aws.awsRegion | string | `"us-east-1"` |  |
+| aws.secretAccessKey | string | `""` |  |
+| conf.hiveSite | object | `{}` |  |
+| hue.connections.db_host | string | `"{{ template \"hue.fullname\" . }}-postgresql"` |  |
+| hue.connections.db_name | string | `"hue"` |  |
+| hue.connections.db_pass | string | `"hue"` |  |
+| hue.connections.db_pass_script | string | `nil` |  |
+| hue.connections.db_port | string | `"5432"` |  |
+| hue.connections.db_user | string | `"hue"` |  |
+| hue.replicas | int | `1` |  |
+| hue.zz_hue_ini | string | `"[desktop]\nsecret_key=hue123\napp_blacklist=filebrowser,search,hbase,security,jobbrowser,oozie\ndjango_debug_mode=false\ngunicorn_work_class=sync\nenable_prometheus=true\n\n[[task_server]]\nenabled=false\nbroker_url=redis://redis:6379/0\nresult_cache='{\"BACKEND\": \"django_redis.cache.RedisCache\", \"LOCATION\": \"redis://redis:6379/0\", \"OPTIONS\": {\"CLIENT_CLASS\": \"django_redis.client.DefaultClient\"},\"KEY_PREFIX\": \"queries\"}'\ncelery_result_backend=redis://redis:6379/0\n"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.registry | string | `"gethue/hue"` |  |
+| image.tag | string | `"4.10.0"` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.hosts[0] | string | `"hue.local"` |  |
+| ingress.path | string | `"/"` |  |
+| ingress.pathType | string | `"ImplementationSpecific"` |  |
+| ingress.tls | list | `[]` |  |
+| postgresql.enabled | bool | `true` |  |
+| postgresql.global.postgresql.auth.database | string | `"hue"` |  |
+| postgresql.global.postgresql.auth.password | string | `"hue"` |  |
+| postgresql.global.postgresql.auth.postgresPassword | string | `"postgres"` |  |
+| postgresql.global.postgresql.auth.username | string | `"hue"` |  |
+| service.annotations | object | `{}` |  |
+| service.loadBalancerIP | string | `nil` |  |
+| service.port | int | `80` |  |
+| service.type | string | `"NodePort"` |  |
 
-Then follow-up the instructions printed on the screen for getting the URL to connect to Hue.
-
-By default you should see these running containers:
-
-    kubectl get pods
-    NAME                                          READY   STATUS    RESTARTS   AGE
-    hue-4n2ck                                     1/1       Running   0          3h
-    postgres-hue-5jg77                            1/1       Running   0          12d
-
-And just copy paste the information printed on the screen or run
-
-    kubectl port-forward svc/hue 8888:8888 --address 0.0.0.0
-
-and open-up http://localhost:8888
-
-## Uninstall
-
-    helm delete hue
-
-## Ingress
-
-### Minimal
-
-    microk8s.enable ingress
-
-    kubectl edit daemonsets nginx-ingress-microk8s-controller
-
-And can edit `--default-backend-service=$(POD_NAMESPACE)/default-http-backend`.
-
-### NGINX
-
-Follow https://kubernetes.github.io/ingress-nginx/deploy/#using-helm
-
-    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-
-    helm install ingress-nginx ingress-nginx/ingress-nginx
-
-And set `ingress.create=true` and `ingress.type=nginx` in [values.yaml](values.yaml).
-
-For SSL, one option is to check `jetstack/cert-manager`.
-
-## Using a local registry
-
-e.g. with microk8s and helm3:
-
-    docker build . -t localhost:32000/hue:latest -f tools/docker/hue/Dockerfile
-    docker build . -t localhost:32000/nginx:latest -f tools/docker/nginx/Dockerfile --build-arg registry=localhost:32000 --build-arg tag=latest
-
-    docker push localhost:32000/hue:latest
-    docker push localhost:32000/nginx:latest
-
-    helm install hue hue --set image.registry=localhost:32000
-    helm delete hue
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

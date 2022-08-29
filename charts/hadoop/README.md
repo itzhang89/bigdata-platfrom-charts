@@ -1,22 +1,21 @@
 # hadoop
 
-![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![AppVersion: 3.2.3](https://img.shields.io/badge/AppVersion-3.2.3-informational?style=flat-square)
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/bigdata-charts)](https://artifacthub.io/packages/helm/bigdata-charts/hadoop)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/hadoop)](https://artifacthub.io/packages/helm/bigdata-charts/hadoop) ![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![AppVersion: 3.2.3](https://img.shields.io/badge/AppVersion-3.2.3-informational?style=flat-square)
 
 The Apache Hadoop software library is a framework that allows for the distributed processing of large data sets across clusters of computers using simple programming models.
 
 ## Installing the Chart
 
-To install the chart with the release name `my-release`:
+To install the chart with the release name `my-hadoop`:
 
 ```console
 $ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
-$ helm upgrade --install my-release yutianaiqingtian/hadoop
+$ helm upgrade --install my-hadoop yutianaiqingtian/hadoop --version 1.0.1
 ```
 To uninstall the release
 
 ```console
-$ helm delete my-release
+$ helm delete my-hadoop
 ```
 
 ## Values
@@ -24,19 +23,23 @@ $ helm delete my-release
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | antiAffinity | string | `"soft"` |  |
-| conf | object | `{"coreSite":null,"hdfsSite":{"dfs.replication":3},"httpfsSite":{},"mapredSite":{},"yarnSite":{}}` | conf.coreSite all of the configure will take effect in the core-site.xml file |
+| conf.coreSite | string | `nil` | conf.coreSite this configuration will take effect in the core-site.xml file |
+| conf.hdfsSite | object | `{"dfs.replication":3}` | conf.hdfsSite this configuration will take effect in the hdfs-site.xml file |
+| conf.httpfsSite | object | `{}` | conf.httpfsSite this configuration will take effect in the httpfs-site.xml file |
+| conf.mapredSite | object | `{}` | conf.mapredSite this configuration will take effect in the mapred-site.xml file |
+| conf.yarnSite | object | `{}` | conf.yarnSite this configuration will take effect in the yarn-site.xml file |
 | dataNode.httpPort | int | `9864` |  |
 | dataNode.httpsPort | int | `9865` |  |
-| dataNode.pdbMinAvailable | int | `3` |  |
+| dataNode.pdbMinAvailable | int | `3` | ensure to set this value before deploying |
 | dataNode.port | int | `9867` |  |
-| dataNode.replicas | int | `3` |  |
+| dataNode.replicas | int | `3` | ensure this value is higher or equal to 'conf.hdfsSite.dfs.replication' |
 | dataNode.resources.limits.cpu | string | `"1000m"` |  |
 | dataNode.resources.limits.memory | string | `"2048Mi"` |  |
 | dataNode.resources.requests.cpu | string | `"10m"` |  |
 | dataNode.resources.requests.memory | string | `"256Mi"` |  |
 | historyserver.enabled | bool | `true` |  |
 | historyserver.pdbMinAvailable | int | `1` |  |
-| historyserver.port | int | `19888` |  |
+| historyserver.port | int | `19888` | historyserver container port. Default HTTP port is 19888. |
 | historyserver.replicas | int | `1` |  |
 | historyserver.service.annotations | object | `{}` |  |
 | historyserver.service.loadBalancerIP | string | `nil` |  |
@@ -44,7 +47,9 @@ $ helm delete my-release
 | historyserver.service.type | string | `"ClusterIP"` |  |
 | httpfs.adminPort | int | `14001` |  |
 | httpfs.port | int | `14000` |  |
-| image | object | `{"pullPolicy":"IfNotPresent","repository":"5200710/hadoop","tag":"3.2.3-java8"}` | image.pullPolicy hadoop Docker image pullPolicy |
+| image.pullPolicy | string | `"IfNotPresent"` | hadoop Docker image pullPolicy |
+| image.repository | string | `"5200710/hadoop"` | hadoop Docker image repository. eg. [Docker Hub| Hadoop ](https://hub.docker.com/repository/docker/5200710/hadoop) |
+| image.tag | string | `"3.2.3-java8"` | hadoop Docker image tag |
 | ingress.dataNode.annotations | object | `{}` |  |
 | ingress.dataNode.enabled | bool | `false` |  |
 | ingress.dataNode.hosts[0] | string | `"hdfs-datanode.local"` |  |
