@@ -39,7 +39,7 @@ sed -i '$a\    </property>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
 
 sed -i '$a\    <property>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
 sed -i '$a\      <name>yarn.log.server.url</name>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
-sed -i '$a\      <value>http://my-platform-hadoop-historyserver-hl:19888/jobhistory/logs</value>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
+sed -i '$a\      <value>http://my-hadoop-historyserver-hl:19888/jobhistory/logs</value>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
 sed -i '$a\    </property>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
 
 sed -i '$a\</configuration>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
@@ -49,12 +49,12 @@ sed -i '$d' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
 
 sed -i '$a\    <property>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
 sed -i '$a\      <name>mapreduce.jobhistory.address</name>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
-sed -i '$a\      <value>my-platform-hadoop-historyserver-hl:10020</value>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
+sed -i '$a\      <value>my-hadoop-historyserver-hl:10020</value>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
 sed -i '$a\    </property>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
 
 sed -i '$a\    <property>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
 sed -i '$a\      <name>mapreduce.jobhistory.webapp.address</name>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
-sed -i '$a\      <value>my-platform-hadoop-historyserver-hl:19888</value>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
+sed -i '$a\      <value>my-hadoop-historyserver-hl:19888</value>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
 sed -i '$a\    </property>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
 
 sed -i '$a\</configuration>' /opt/soft/hadoop/etc/hadoop/mapred-site.xml
@@ -64,7 +64,7 @@ sed -i '$d' /opt/soft/hadoop/etc/hadoop/core-site.xml
 
 sed -i '$a\    <property>' /opt/soft/hadoop/etc/hadoop/core-site.xml
 sed -i '$a\      <name>fs.defaultFS</name>' /opt/soft/hadoop/etc/hadoop/core-site.xml
-sed -i '$a\      <value>hdfs://my-platform-hadoop-namenode:9820</value>' /opt/soft/hadoop/etc/hadoop/core-site.xml
+sed -i '$a\      <value>hdfs://my-hadoop-namenode:9820</value>' /opt/soft/hadoop/etc/hadoop/core-site.xml
 sed -i '$a\    </property>' /opt/soft/hadoop/etc/hadoop/core-site.xml
 
 sed -i '$a\</configuration>' /opt/soft/hadoop/etc/hadoop/core-site.xml
@@ -74,7 +74,7 @@ cd /opt/soft/spark && cp ./conf/spark-defaults.conf.template ./conf/spark-defaul
 
 sed -i '$a\spark.eventLog.dir=hdfs:///user/spark/applicationHistory' /opt/soft/spark/conf/spark-defaults.conf
 sed -i '$a\spark.eventLog.enabled=true' /opt/soft/spark/conf/spark-defaults.conf
-sed -i '$a\spark.yarn.historyServer.address=http://my-platform-spark-master-svc:18080' /opt/soft/spark/conf/spark-defaults.conf
+sed -i '$a\spark.yarn.historyServer.address=http://my-spark-master-svc:18080' /opt/soft/spark/conf/spark-defaults.conf
 
 # start the spark history server
 mkdir -p /tmp/spark-events && ./sbin/start-history-server.sh
