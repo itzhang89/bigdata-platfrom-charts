@@ -1,107 +1,68 @@
-# Helm Chart for phpLDAPadmin
+# phpldapadmin
 
-[![CircleCI](https://circleci.com/gh/cetic/helm-phpLDAPadmin.svg?style=svg)](https://circleci.com/gh/cetic/helm-phpLDAPadmin/tree/master) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![version](https://img.shields.io/github/tag/cetic/helm-phpLDAPadmin.svg?label=release)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/phpldapadmin)](https://artifacthub.io/packages/helm/bigdata-charts/phpldapadmin) ![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![AppVersion: 0.7.1](https://img.shields.io/badge/AppVersion-0.7.1-informational?style=flat-square)
 
-## Introduction
+Web-based LDAP browser to manage your LDAP server
 
-This [Helm](https://github.com/kubernetes/helm) chart installs [phpLDAPadmin](http://phpldapadmin.sourceforge.net/wiki/index.php/Main_Page) in a Kubernetes cluster.
+## Installing the Chart
 
-## Prerequisites
+To install the chart with the release name `my-phpldapadmin`:
 
-- Kubernetes cluster 1.10+
-- Helm 2.8.0+
-- PV provisioner support in the underlying infrastructure.
+```console
+$ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
+$ helm upgrade --install my-phpldapadmin yutianaiqingtian/phpldapadmin --version 0.1.2
+```
+To uninstall the release
 
-## Installation
-
-### Add Helm repository
-
-```bash
-helm repo add cetic https://cetic.github.io/helm-charts
-helm repo update
+```console
+$ helm delete my-phpldapadmin
 ```
 
-### Configure the chart
+## Values
 
-The following items can be set via `--set` flag during installation or configured by editing the `values.yaml` directly (you need to download the chart first).
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| env.PHPLDAPADMIN_HTTPS | bool | `false` |  |
+| env.PHPLDAPADMIN_TRUST_PROXY_SSL | bool | `true` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"osixia/phpldapadmin"` |  |
+| image.tag | string | `"0.9.0"` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.apiVersion | string | `""` |  |
+| ingress.enabled | bool | `true` |  |
+| ingress.extraHosts | list | `[]` |  |
+| ingress.extraPaths | list | `[]` |  |
+| ingress.extraRules | list | `[]` |  |
+| ingress.extraTls | list | `[]` |  |
+| ingress.hostname | string | `"phpldapadmin.local"` |  |
+| ingress.ingressClassName | string | `""` |  |
+| ingress.path | string | `"/"` |  |
+| ingress.pathType | string | `"ImplementationSpecific"` |  |
+| ingress.secrets | list | `[]` |  |
+| ingress.selfSigned | bool | `false` |  |
+| ingress.tls | bool | `false` |  |
+| livenessProbe.httpGet.path | string | `"/"` |  |
+| livenessProbe.httpGet.port | string | `"http"` |  |
+| nodeSelector | object | `{}` |  |
+| readinessProbe.httpGet.path | string | `"/"` |  |
+| readinessProbe.httpGet.port | string | `"http"` |  |
+| replicaCount | int | `1` |  |
+| resources | object | `{}` |  |
+| service.annotations | object | `{}` |  |
+| service.clusterIP | string | `""` |  |
+| service.externalTrafficPolicy | string | `"Cluster"` |  |
+| service.extraPorts | list | `[]` |  |
+| service.loadBalancerIP | string | `""` |  |
+| service.loadBalancerSourceRanges | list | `[]` |  |
+| service.nodePorts.http | string | `""` |  |
+| service.nodePorts.https | string | `""` |  |
+| service.ports.http | int | `80` |  |
+| service.ports.https | int | `443` |  |
+| service.sessionAffinity | string | `"None"` |  |
+| service.sessionAffinityConfig | object | `{}` |  |
+| service.type | string | `"ClusterIP"` |  |
+| tolerations | list | `[]` |  |
 
-#### Configure the way how to expose phpLDAPadmin service:
-
-- **Ingress**: The ingress controller must be installed in the Kubernetes cluster.
-- **ClusterIP**: Exposes the service on a cluster-internal IP. Choosing this value makes the service only reachable from within the cluster.
-- **NodePort**: Exposes the service on each Node’s IP at a static port (the NodePort). You’ll be able to contact the NodePort service, from outside the cluster, by requesting `NodeIP:NodePort`.
-- **LoadBalancer**: Exposes the service externally using a cloud provider’s load balancer.
-
-#### Configure how to persist data (TODO):
-
-- **Disable**: The data does not survive the termination of a pod.
-- **Persistent Volume Claim(default)**: A default `StorageClass` is needed in the Kubernetes cluster to dynamic provision the volumes. Specify another StorageClass in the `storageClass` or set `existingClaim` if you have already existing persistent volumes to use.
-
-### Install the chart
-
-Install the phpLDAPadmin helm chart with a release name `my-release`:
-
-```bash
-helm install --name my-release cetic/phpldapadmin
-```
-
-## Uninstallation
-
-To uninstall/delete the `my-release` deployment:
-
-```bash
-helm delete --purge my-release
-```
-
-## Configuration
-
-The following table lists the configurable parameters of the phpLDAPadmin chart and the default values.
-
-| Parameter                                                                   | Description                                                                                                        | Default                         |
-| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------| ------------------------------- |
-| **ReplicaCount**                                                            |
-| `replicaCount`                                                              | number of phpLDAPadmin images                                                                                               | `1`      |
-| **Env**                                                                     |
-| `env`                                                                       | See values.yaml                                                                                                           | `nil`      |
-| **Image**                                                                   |
-| `image.repository`                                                          | phpldapadmin Image name                                                                                                 | `osixia/phpldapadmin`      |
-| `image.tag`                                                                 | phpldapadmin Image tag                                                                                                  | `0.7.1`                    |
-| `image.pullPolicy`                                                          | phpldapadmin Image pull policy                                                                                          | `IfNotPresent`             |
-| **Service**                                                                 |
-| `service.type`                                                              | Type of service for phpldapadmin frontend                                                                               | `LoadBalancer`             |
-| `service.port`                                                              | Port to expose service                                                                                             | `80`                            |
-| `service.loadBalancerIP`                                                    | LoadBalancerIP if service type is `LoadBalancer`                                                                   | `nil`                           |
-| `service.loadBalancerSourceRanges`                                          | LoadBalancerSourceRanges                                                                                           | `nil`                           |
-| `service.annotations`                                                       | Service annotations                                                                                                | `{}`                            |
-| **Ingress**                                                                 |
-| `ingress.enabled`                                                           | Enables Ingress                                                                                                    | `false`                         |
-| `ingress.annotations`                                                       | Ingress annotations                                                                                                | `{}`                            |
-| `ingress.path`                                                              | Path to access frontend                                                                                            | `/`                             |
-| `ingress.hosts`                                                             | Ingress hosts                                                                                                      | `nil`                           |
-| `ingress.tls`                                                               | Ingress TLS configuration                                                                                          | `[]`                            |
-| **ReadinessProbe**                                                          |
-| `readinessProbe`                                                            | Rediness Probe settings                                                                                            | `{ "httpGet": { "path": "/", "port": http }}`|
-| **LivenessProbe**                                                           |
-| `livenessProbe`                                                             | Liveness Probe settings                                                                                            | `{ "httpGet": { "path": "/", "port": http }}`|
-| **Resources**                                                               |
-| `resources`                                                                 | CPU/Memory resource requests/limits                                                                                | `{}`                            |
-| **nodeSelector**                                                            |
-| `nodeSelector`                                                              | nodeSelector                                                                                                       | `{}`                            |
-| **tolerations**                                                             |
-| `tolerations`                                                               | tolerations                                                                                                        | `{}`                            |
-| **affinity**                                                                |
-| `affinity`                                                                  | affinity                                                                                                           | `{}`                            |
-
-## Credits
-
-Initially inspired from https://github.com/gengen1988/helm-phpldapadmin.
-
-## Contributing
-
-Feel free to contribute by making a [pull request](https://github.com/cetic/helm-phpLDAPadmin/pull/new/master).
-
-Please read the official [Contribution Guide](https://github.com/helm/charts/blob/master/CONTRIBUTING.md) from Helm for more information on how you can contribute to this Chart.
-
-## License
-
-[Apache License 2.0](/LICENSE)
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
