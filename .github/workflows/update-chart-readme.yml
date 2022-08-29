@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - charts/**/values.yaml
+      - charts/**/Chart.yaml
       - values.yaml.template
       - README.md.gotmpl
     types:

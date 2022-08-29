@@ -1,0 +1,269 @@
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: superset
+    url: https://apache.github.io/superset
+
+releases:
+  - name: my-hadoop
+    chart: ./charts/hadoop
+    values:
+      - conf:
+          ## @param hadoop.conf.coreSite will append the key and value to the core-site.xml file
+          coreSite:
+            # defined the Unix user[hue] that will run the hue supervisor server as a proxyuser. ref: https://docs.gethue.com/administrator/configuration/connectors/#hdfs
+            hadoop.proxyuser.hue.hosts: "*"
+            hadoop.proxyuser.hue.groups: "*"
+            # defined the Unix user[httpfs] that will run the HttpFS server as a proxyuser. ref: https://hadoop.apache.org/docs/stable/hadoop-hdfs-httpfs/ServerSetup.html
+            hadoop.proxyuser.httpfs.hosts: "*"
+            hadoop.proxyuser.httpfs.groups: "*"
+            # defined the Unix user[hive] that will run the HiveServer2 server as a proxyuser. ref: https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/Superusers.html
+            hadoop.proxyuser.hive.hosts: "*"
+            hadoop.proxyuser.hive.groups: "*"
+          hdfsSite:
+            dfs.permissions.enabled: false
+            dfs.webhdfs.enable: true
+            dfs.replication: 3
+          httpfsSite:
+            # Hue HttpFS proxy user setting. ref: https://docs.gethue.com/administrator/configuration/connectors/#hdfs
+            httpfs.proxyuser.hue.hosts: "*"
+            httpfs.proxyuser.hue.groups: "*"
+      - ingress:
+          nameNode:
+            enabled: true
+            hosts:
+              - hdfs.demo.com
+          resourcemanager:
+            enabled: true
+            hosts:
+              - resourcemanager.demo.com
+  - name: my-hive
+    chart: ./charts/hive
+    needs:
+      - my-hadoop
+    values:
+      - conf:
+          hiveSite:
+            hive.metastore.warehouse.dir: hdfs://my-hadoop-namenode:9820/user/hive/warehouse
+            hive.metastore.schema.verification: false
+          hadoopConfigMap: my-hadoop-hadoop
+
+  - name: my-openldap
+    chart: ./charts/openldap
+    values:
+      - adminPassword: Root@2022
+      - configPassword: Root@2022
+      - env:
+          LDAP_ORGANISATION: "Training Inc."
+          LDAP_DOMAIN: "demo.com"
+          LDAP_TLS: "false"
+          LDAP_TLS_VERIFY_CLIENT: "nerver"
+      - customLdifFiles:
+          01-default-users.ldif: |-
+            # Entry 2: ou=databu,dc=demo,dc=com
+            dn: ou=databu,dc=demo,dc=com
+            objectclass: organizationalUnit
+            objectclass: top
+            ou: databu
+            
+            # Entry 3: cn=yhj,ou=databu,dc=demo,dc=com
+            dn: cn=yhj,ou=databu,dc=demo,dc=com
+            cn: yhj
+            gidnumber: 500
+            givenname: y
+            homedirectory: /home/users/yhj
+            loginshell: /bin/bash
+            objectclass: inetOrgPerson
+            objectclass: posixAccount
+            objectclass: top
+            sn: hj
+            uid: yhj
+            uidnumber: 1001
+            userpassword: {MD5}lOjN5GErP9OQZ31C57IgAg==
+            
+            # Entry 4: cn=zhy,ou=databu,dc=demo,dc=com
+            dn: cn=zhy,ou=databu,dc=demo,dc=com
+            cn: zhy
+            gidnumber: 500
+            givenname: z
+            homedirectory: /home/users/zhy
+            loginshell: /bin/bash
+            objectclass: inetOrgPerson
+            objectclass: posixAccount
+            objectclass: top
+            sn: hy
+            uid: zhy
+            uidnumber: 1007
+            userpassword: {MD5}lOjN5GErP9OQZ31C57IgAg==
+            
+            # Entry 5: cn=zjh,ou=databu,dc=demo,dc=com
+            dn: cn=zjh,ou=databu,dc=demo,dc=com
+            cn: zjh
+            employeetype: Admin
+            gidnumber: 500
+            givenname: z
+            homedirectory: /home/users/zjh
+            loginshell: /bin/bash
+            objectclass: inetOrgPerson
+            objectclass: posixAccount
+            objectclass: top
+            sn: jh
+            uid: zjh
+            uidnumber: 1000
+            userpassword: {MD5}lOjN5GErP9OQZ31C57IgAg==
+
+
+      - phpldapadmin:
+          ingress:
+            enabled: false
+  - name: my-postgresql
+    chart: bitnami/postgresql
+    version: ~11.6.0
+    values:
+      - global:
+          postgresql:
+            auth:
+              postgresPassword: "Root@2022"
+              database: "training"
+              username: "training"
+              password: "Training@2022"
+  - name: my-hue
+    chart: ./charts/hue
+    needs:
+      - my-hadoop
+      - my-hive
+      - my-openldap
+    values:
+      - ingress:
+          enabled: true
+          hosts:
+            - hue.demo.com
+          annotations:
+            nginx.ingress.kubernetes.io/proxy-body-size: 2048m
+      - hue:
+          replicas: 1
+          interpreters: |-
+            [[[postgresql]]]
+            name = postgresql
+            interface=sqlalchemy
+            options='{"url": "postgresql://training:Training@2022@my-postgresql:5432/training"}'
+          zz_hue_ini: |
+            [desktop]
+            secret_key=hue123
+            # ref: https://gethue.com/mini-how-to-disabling-some-apps-from-showing-up/
+            app_blacklist=spark,zookeeper,hbase,impala,search,pig,sqoop,security,oozie,jobsub,jobbrowser
+            django_debug_mode=false
+            gunicorn_work_class=sync
+            enable_prometheus=true
+            
+            [[task_server]]
+            enabled=false
+            broker_url=redis://redis:6379/0
+            result_cache='{"BACKEND": "django_redis.cache.RedisCache", "LOCATION": "redis://redis:6379/0", "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},"KEY_PREFIX": "queries"}'
+            celery_result_backend=redis://redis:6379/0
+            
+            [[custom]]
+            [[auth]]
+            backend=desktop.auth.backend.LdapBackend,desktop.auth.backend.AllowFirstUserDjangoBackend
+            
+            [[ldap]]
+            ldap_url=ldap://my-openldap:389
+            search_bind_authentication=true
+            use_start_tls=false
+            create_users_on_login=true
+            base_dn="ou=databu,dc=demo,dc=com"
+            bind_dn="cn=admin,dc=demo,dc=com"
+            bind_password=Root@2022
+            test_ldap_user="cn=admin,dc=demo,dc=com"
+            test_ldap_group="cn=openldap,dc=demo,dc=com"
+            
+            [[[users]]]
+            user_filter="objectClass=posixAccount"
+            user_name_attr="uid"
+            
+            [[[groups]]]
+            group_filter="objectClass=posixGroup"
+            group_name_attr="cn"
+            group_member_attr="memberUid"
+            
+            [beeswax]
+            # Host where HiveServer2 is running.
+            hive_server_host=my-hive-hiveserver
+            # Port where HiveServer2 Thrift server runs on.
+            hive_server_port=10000
+            thrift_version=7
+            
+            [notebook]
+            [[interpreters]]
+            [[[hive]]]
+            name=Hive
+            interface=hiveserver2
+            
+            [hadoop]
+            [[hdfs_clusters]]
+            [[[default]]]
+            fs_defaultfs=hdfs://my-hadoop:9820
+            webhdfs_url=http://my-hadoop-httpfs:14000/webhdfs/v1
+            
+            # Configuration for YARN (MR2)
+            # ------------------------------------------------------------------------
+            [[yarn_clusters]]
+            [[[default]]]
+            resourcemanager_host=my-hadoop-resourcemanager-hl
+            resourcemanager_api_url=http://my-hadoop-resourcemanager-hl:8088/
+            resourcemanager_port=8032
+            history_server_api_url=http://my-hadoop-historyserver-hl:19888/
+            spark_history_server_url=http://my-hadoop-spark-master-svc:18080
+
+  - name: my-dolphinscheduler
+    chart: ./charts/dolphinscheduler
+    needs:
+      - my-hadoop
+      - my-hive
+    values:
+      - ingress:
+          enabled: true
+          host: "dolphinscheduler.demo.com"
+          path: "/"
+          annotations:
+            nginx.ingress.kubernetes.io/proxy-body-size: 2048m
+      - common:
+          configmap:
+            RESOURCE_STORAGE_TYPE: "HDFS"
+            FS_DEFAULT_FS: "hdfs://my-hadoop-namenode:9820"
+          ## Shared storage persistence mounted into api, master and worker, such as Hadoop, Spark, Flink and DataX binary package
+          sharedStoragePersistence:
+            enabled: true
+            storageClassName: rook-cephfs
+      - conf:
+          common:
+            resource.storage.type: HDFS
+            fs.defaultFS: hdfs://my-hadoop-namenode:9820
+
+  - name: my-spark
+    chart: bitnami/spark
+    version: ~6.1.5
+    values:
+      - ingress:
+          enabled: true
+          hostname: spark.demo.com
+
+  - name: my-superset
+    chart: superset/superset
+    version: ~0.7.1
+    needs:
+      - my-postgresql
+      - my-hive
+    values:
+      - image:
+          tag: 2.0.0
+        ingress:
+          enabled: true
+          hosts:
+            - superset.demo.com
+        init:
+          adminUser:
+            password: Root@2022
+
+helmDefaults:
+  tillerNamespace: bigdata

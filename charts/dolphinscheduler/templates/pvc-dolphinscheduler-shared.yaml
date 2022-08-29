@@ -18,9 +18,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-shared
+  name: {{ include "dolphinscheduler.fullname" . }}-shared
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-shared
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-shared
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
   annotations:
     "helm.sh/resource-policy": keep

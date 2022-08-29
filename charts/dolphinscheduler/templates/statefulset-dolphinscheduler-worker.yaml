@@ -17,7 +17,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker
+  name: {{ include "dolphinscheduler.fullname" . }}-worker
   labels:
     {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}
 spec:
@@ -26,7 +26,7 @@ spec:
   selector:
     matchLabels:
       {{- include "dolphinscheduler.worker.labels" . | nindent 6 }}
-  serviceName: {{ template "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-headless
+  serviceName: {{ template "dolphinscheduler.fullname" . }}-worker-headless
   template:
     metadata:
       labels:
@@ -53,7 +53,7 @@ spec:
       - name: {{ .Values.image.pullSecret }}
       {{- end }}
       containers:
-        - name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker
           image: {{ include "dolphinscheduler.image.fullname.worker" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -65,7 +65,7 @@ spec:
             - name: SPRING_JACKSON_TIME_ZONE
               value: {{ .Values.timezone }}
             - name: ALERT_LISTEN_HOST
-              value: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-alert
+              value: {{ include "dolphinscheduler.fullname" . }}-alert
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
@@ -75,7 +75,7 @@ spec:
             {{ end }}
           envFrom:
             - configMapRef:
-                name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-common
+                name: {{ include "dolphinscheduler.fullname" . }}-common
           {{- if .Values.worker.resources }}
           resources:
             {{- toYaml .Values.worker.resources | nindent 12 }}
@@ -102,41 +102,41 @@ spec:
           {{- end }}
           volumeMounts:
             - mountPath: {{ default "/tmp/dolphinscheduler" .Values.common.configmap.DATA_BASEDIR_PATH | quote }}
-              name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-data
+              name: {{ include "dolphinscheduler.fullname" . }}-worker-data
             - mountPath: "/opt/dolphinscheduler/logs"
-              name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-logs
+              name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
               subPath: common_properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
       volumes:
-        - name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-data
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
           {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-data
+            claimName: {{ include "dolphinscheduler.fullname" . }}-worker-data
           {{- else }}
           emptyDir: {}
           {{- end }}
-        - name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-logs
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
           {{- if .Values.worker.persistentVolumeClaim.logsPersistentVolume.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-logs
+            claimName: {{ include "dolphinscheduler.fullname" . }}-worker-logs
           {{- else }}
           emptyDir: {}
           {{- end }}
         - name: config-volume
           configMap:
-            name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-configs
+            name: {{ include "dolphinscheduler.fullname" . }}-configs
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
   {{- if .Values.worker.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
     - metadata:
-        name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-data
+        name: {{ include "dolphinscheduler.fullname" . }}-worker-data
         labels:
-          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-data
+          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-data
           {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
       spec:
         accessModes:
@@ -150,9 +150,9 @@ spec:
     {{- end }}
     {{- if .Values.worker.persistentVolumeClaim.logsPersistentVolume.enabled }}
     - metadata:
-        name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-logs
+        name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
         labels:
-          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-worker-logs
+          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
           {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
       spec:
         accessModes:

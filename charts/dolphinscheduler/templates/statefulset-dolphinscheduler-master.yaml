@@ -17,7 +17,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
+  name: {{ include "dolphinscheduler.fullname" . }}-master
   labels:
     {{- include "dolphinscheduler.master.labels" . | nindent 4 }}
 spec:
@@ -26,7 +26,7 @@ spec:
   selector:
     matchLabels:
       {{- include "dolphinscheduler.master.labels" . | nindent 6 }}
-  serviceName: {{ template "dolphinscheduler.fullname" . }}-dolphinscheduler-master-headless
+  serviceName: {{ template "dolphinscheduler.fullname" . }}-master-headless
   template:
     metadata:
       labels:
@@ -53,7 +53,7 @@ spec:
       - name: {{ .Values.image.pullSecret }}
       {{- end }}
       containers:
-        - name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
+        - name: {{ include "dolphinscheduler.fullname" . }}-master
           image: {{ include "dolphinscheduler.image.fullname.master" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -73,7 +73,7 @@ spec:
             {{ end }}
           envFrom:
             - configMapRef:
-                name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-common
+                name: {{ include "dolphinscheduler.fullname" . }}-common
           {{- if .Values.master.resources }}
           resources:
             {{- toYaml .Values.master.resources | nindent 12 }}
@@ -100,29 +100,29 @@ spec:
           {{- end }}
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
-              name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
+              name: {{ include "dolphinscheduler.fullname" . }}-master
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
               subPath: common_properties
       volumes:
-        - name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
+        - name: {{ include "dolphinscheduler.fullname" . }}-master
           {{- if .Values.master.persistentVolumeClaim.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
+            claimName: {{ include "dolphinscheduler.fullname" . }}-master
           {{- else }}
           emptyDir: {}
           {{- end }}
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         - name: config-volume
           configMap:
-            name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-configs
+            name: {{ include "dolphinscheduler.fullname" . }}-configs
   {{- if .Values.master.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     - metadata:
-        name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
+        name: {{ include "dolphinscheduler.fullname" . }}-master
         labels:
-          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-dolphinscheduler-master
+          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
           {{- include "dolphinscheduler.common.labels" . | nindent 10 }}
       spec:
         accessModes:
