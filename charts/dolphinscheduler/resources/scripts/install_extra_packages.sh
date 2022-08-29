@@ -32,6 +32,11 @@ sed -i 's|DefaultResourceCalculator|DominantResourceCalculator|g' /opt/soft/hado
 sed -i '$d' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
 
 sed -i '$a\    <property>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
+sed -i '$a\      <name>yarn.resourcemanager.hostname</name>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
+sed -i '$a\      <value>my-hadoop-resourcemanager-hl</value>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
+sed -i '$a\    </property>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
+
+sed -i '$a\    <property>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
 sed -i '$a\      <description>Whether to enable log aggregation</description>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
 sed -i '$a\      <name>yarn.log-aggregation-enable</name>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
 sed -i '$a\      <value>true</value>' /opt/soft/hadoop/etc/hadoop/yarn-site.xml
@@ -69,6 +74,7 @@ sed -i '$a\    </property>' /opt/soft/hadoop/etc/hadoop/core-site.xml
 
 sed -i '$a\</configuration>' /opt/soft/hadoop/etc/hadoop/core-site.xml
 
+/opt/soft/hadoop/bin/hdfs dfs -mkdir -p /user/spark/applicationHistory
 # 修改spakr-defaults.conf文件：
 cd /opt/soft/spark && cp ./conf/spark-defaults.conf.template ./conf/spark-defaults.conf
 
