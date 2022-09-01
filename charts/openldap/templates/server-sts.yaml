@@ -1,7 +1,7 @@
-apiVersion: {{ template "statefulset.apiVersion" . }}
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name:  {{ template "openldap.fullname" . }}
+  name:  {{ include "openldap.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "openldap.name" . }}
     app.kubernetes.io/component: openldap
@@ -10,21 +10,21 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "openldap.fullname" . }}
+      app: {{ include "openldap.fullname" . }}
       release: {{ .Release.Name }}
-  serviceName: {{ template "openldap.fullname" . }}-headless
+  serviceName: {{ include "openldap.fullname" . }}-headless
   template:
     metadata:
       annotations:
-        checksum/configmap-env: {{ include (print $.Template.BasePath "/configmap-env.yaml") . | sha256sum }}
+        checksum/configmap-env: {{ include (print $.Template.BasePath "/server-cm-env.yaml") . | sha256sum }}
 {{- if .Values.customLdifFiles}}
-        checksum/configmap-customldif: {{ include (print $.Template.BasePath "/configmap-customldif.yaml") . | sha256sum }}
+        checksum/configmap-customldif: {{ include (print $.Template.BasePath "/server-cm-customldif.yaml") . | sha256sum }}
 {{- end }}
 {{- if .Values.podAnnotations}}
 {{ toYaml .Values.podAnnotations | indent 8}}
 {{- end }}
       labels:
-        app: {{ template "openldap.fullname" . }}
+        app: {{ include "openldap.fullname" . }}
         release: {{ .Release.Name }}
     spec:
       containers:
@@ -44,7 +44,7 @@ spec:
               containerPort: 636
           envFrom:
             - configMapRef:
-                name: {{ template "openldap.fullname" . }}-env
+                name: {{ include "openldap.fullname" . }}-env
             - secretRef:
                 name: {{ template "openldap.secretName" . }}
           volumeMounts:
@@ -67,7 +67,7 @@ spec:
                   apiVersion: v1
                   fieldPath: metadata.name
             #- name: HOSTNAME
-            #  value: $(POD_NAME).{{ template "openldap.fullname" . }}-headless
+            #  value: $(POD_NAME).{{ include "openldap.fullname" . }}-headless
           {{- if .Values.tls.enabled }}
             - name: LDAP_TLS_CRT_FILENAME
               value: tls.crt
@@ -114,7 +114,7 @@ spec:
       volumes:
         - name: custom-ldif-files
           configMap:
-            name: {{ template "openldap.fullname" . }}-customldif
+            name: {{ include "openldap.fullname" . }}-customldif
 {{- end }}
 {{- if .Values.persistence.enabled }} 
   volumeClaimTemplates:

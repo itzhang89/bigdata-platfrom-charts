@@ -1,0 +1,63 @@
+{{- if and .Values.phpldapadmin.enabled .Values.phpldapadmin.ingress.enabled }}
+apiVersion: v1
+kind: Ingress
+metadata:
+  name: {{ printf "%s-ingress" (include "common.names.fullname" .) }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: ingress
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.phpldapadmin.ingress.annotations .Values.commonAnnotations }}
+  annotations:
+    {{- if .Values.phpldapadmin.ingress.annotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.phpldapadmin.ingress.annotations "context" $) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  {{- if and .Values.phpldapadmin.ingress.ingressClassName (eq "true" (include "common.ingress.supportsIngressClassname" .)) }}
+  ingressClassName: {{ .Values.phpldapadmin.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.phpldapadmin.ingress.hostname }}
+    - host: {{ .Values.phpldapadmin.ingress.hostname }}
+      http:
+        paths:
+          {{- if .Values.phpldapadmin.ingress.extraPaths }}
+          {{- toYaml .Values.phpldapadmin.ingress.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.phpldapadmin.ingress.path }}
+            {{- if eq "true" (include "common.ingress.supportsPathType" .) }}
+            pathType: {{ .Values.phpldapadmin.ingress.pathType }}
+            {{- end }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-phpldapadmin" (include "common.names.fullname" .)) "servicePort" "http" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.phpldapadmin.ingress.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            {{- if eq "true" (include "common.ingress.supportsPathType" $) }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            {{- end }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (printf "%s-phpldapadmin" (include "common.names.fullname" $)) "servicePort" "http" "context" $) | nindent 14 }}
+    {{- end }}
+    {{- if .Values.phpldapadmin.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.phpldapadmin.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.phpldapadmin.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.phpldapadmin.ingress.annotations )) .Values.phpldapadmin.ingress.selfSigned)) .Values.phpldapadmin.ingress.extraTls }}
+  tls:
+    {{- if and .Values.phpldapadmin.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.phpldapadmin.ingress.annotations )) .Values.phpldapadmin.ingress.selfSigned) }}
+    - hosts:
+        - {{ .Values.phpldapadmin.ingress.hostname }}
+      secretName: {{ printf "%s-tls" .Values.phpldapadmin.ingress.hostname }}
+    {{- end }}
+    {{- if .Values.phpldapadmin.ingress.extraTls }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.phpldapadmin.ingress.extraTls "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

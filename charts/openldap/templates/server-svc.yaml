@@ -5,7 +5,7 @@ metadata:
   annotations:
 {{ toYaml .Values.service.annotations | indent 4 }}
 {{- end }}
-  name: {{ template "openldap.fullname" . }}
+  name: {{ include "openldap.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: {{ include "openldap.name" . }}
@@ -37,5 +37,5 @@ spec:
       {{- else if eq .Values.service.type "ClusterIP" }}
       {{- end }}
   selector:
-    app: {{ template "openldap.fullname" . }}
+    app: {{ include "openldap.fullname" . }}
     release: {{ .Release.Name }}

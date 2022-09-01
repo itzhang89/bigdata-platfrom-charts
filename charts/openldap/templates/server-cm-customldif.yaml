@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "openldap.fullname" . }}-customldif
+  name: {{ include "openldap.fullname" . }}-customldif
   labels:
     app.kubernetes.io/name: {{ include "openldap.name" . }}
     app.kubernetes.io/component: openldap

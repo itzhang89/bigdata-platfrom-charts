@@ -1,6 +1,6 @@
 OpenLDAP has been installed. You can access the server from within the k8s cluster using:
 
-  {{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.ldapPort }}
+  {{ include "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.ldapPort }}
 
 
 You can access the LDAP adminPassword and configPassword using:
@@ -10,7 +10,7 @@ You can access the LDAP adminPassword and configPassword using:
 
 
 You can access the LDAP service, from within the cluster (or with kubectl port-forward) with a command like (replace password and domain):
-  ldapsearch -x -H ldap://{{ template "openldap.fullname" . }}-service.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.ldapPort }} -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w $LDAP_ADMIN_PASSWORD
+  ldapsearch -x -H ldap://{{ include "openldap.fullname" . }}-service.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.ldapPort }} -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w $LDAP_ADMIN_PASSWORD
 
 
 Test server health using Helm test:
@@ -18,3 +18,22 @@ Test server health using Helm test:
 
 
 You can also consider installing the helm chart for phpldapadmin to manage this instance of OpenLDAP, or install Apache Directory Studio, and connect using kubectl port-forward.
+
+1. Get the application URL by running these commands:
+{{- if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ include "common.names.namespace" . }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ printf "%s" (include "common.names.fullname" .) }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ include "common.names.namespace" . }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get svc -w {{ printf "%s" (include "common.names.fullname" .) }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ include "common.names.namespace" . }} {{ printf "%s" (include "common.names.fullname" .) }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:{{ default "80" .Values.phpldapadmin.service.ports.http }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+
+  kubectl port-forward --namespace {{ include "common.names.namespace" . }} svc/{{ printf "%s" (include "common.names.fullname" .) }} {{ default "80" .Values.phpldapadmin.service.ports.http }}:{{ default "80" .Values.phpldapadmin.service.ports.http }}
+  echo "Visit http://127.0.0.1:{{ .Values.phpldapadmin.service.ports.http }} to use your application"
+
+{{- end }}
+
+** Please be patient while the chart is being deployed **

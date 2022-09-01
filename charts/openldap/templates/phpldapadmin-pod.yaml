@@ -1,0 +1,68 @@
+{{- if .Values.phpldapadmin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.phpldapadmin.replicaCount }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" . | nindent 6 }}
+  strategy: {{- include "common.tplvalues.render" (dict "value" .Values.phpldapadmin.updateStrategy "context" $ ) | nindent 4 }}
+  template:
+    metadata:
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        {{- if .Values.phpldapadmin.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.phpldapadmin.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+      annotations:
+        {{- if .Values.phpldapadmin.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.phpldapadmin.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.phpldapadmin.image.repository }}:{{ .Values.phpldapadmin.image.tag }}"
+        imagePullPolicy: {{ .Values.phpldapadmin.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        env:
+        - name: PHPLDAPADMIN_LDAP_HOSTS
+        {{- if not (index .Values.phpldapadmin.env "PHPLDAPADMIN_LDAP_HOSTS" ) }}
+          value: {{ include "openldap.fullname" . }}
+        {{- else -}}
+          value: {{ tpl .Values.phpldapadmin.env "PHPLDAPADMIN_LDAP_HOSTS" }}
+        {{- end }}
+        {{- range $key, $value := .Values.phpldapadmin.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        livenessProbe:
+{{ toYaml .Values.phpldapadmin.livenessProbe | indent 12 }}
+        readinessProbe:
+{{ toYaml .Values.phpldapadmin.readinessProbe | indent 12 }}
+        resources:
+{{ toYaml .Values.phpldapadmin.resources | indent 12 }}
+    {{- with .Values.phpldapadmin.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.phpldapadmin.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.phpldapadmin.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+{{- end }}

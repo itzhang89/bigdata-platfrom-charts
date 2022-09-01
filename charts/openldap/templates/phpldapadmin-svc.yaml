@@ -1,7 +1,8 @@
+{{- if .Values.phpldapadmin.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ printf "%s" (include "common.names.fullname" .) }}
+  name: {{ printf "%s-phpldapadmin" (include "common.names.fullname" .) }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" . | nindent 4 }}
     {{- if .Values.commonLabels }}
@@ -13,8 +14,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: {{ .Values.service.ports.http }}
+    - port: {{ .Values.phpldapadmin.service.ports.http }}
       targetPort: http
       protocol: TCP
       name: http
   selector: {{- include "common.labels.matchLabels" . | nindent 4 }}
+{{- end }}
