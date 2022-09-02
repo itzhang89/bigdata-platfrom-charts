@@ -1,0 +1,12 @@
+{{- if .Values.phpldapadmin.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "openldap.fullname" . }}-phpldapadmin-env
+  labels:
+    app.kubernetes.io/component: phpldapadmin
+    {{- include "openldap.labels" . | nindent 4 }}
+data:
+  PHPLDAPADMIN_LDAP_HOSTS: {{ include "openldap.fullname" . }}
+{{ toYaml .Values.phpldapadmin.env | indent 2 }}
+{{- end }}

@@ -13,4 +13,4 @@ maintainers:
 name: openldap
 sources:
   - https://github.com/kubernetes/charts
-version: 2.0.4
+version: 2.1.0

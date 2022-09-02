@@ -1,14 +1,9 @@
-#
-# A ConfigMap spec for openldap slapd that map directly to files under
-# /container/service/slapd/assets/config/bootstrap/ldif/custom
-#
 {{- if .Values.customLdifFiles }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "openldap.fullname" . }}-customldif
   labels:
-    app.kubernetes.io/name: {{ include "openldap.name" . }}
     app.kubernetes.io/component: openldap
     {{- include "openldap.labels" . | nindent 4 }}
 data:
