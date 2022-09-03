@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ include "hive.fullname" . }}-hive-hadoop-config
   labels:
-    app.kubernetes.io/name: {{ include "hive.name" . }}
+    app.kubernetes.io/component: hive
     {{- include "hive.labels" . | nindent 4 }}
 data:
   core-site.xml: |-

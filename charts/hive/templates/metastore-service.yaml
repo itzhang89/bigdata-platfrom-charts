@@ -1,0 +1,17 @@
+# A headless service to create DNS records
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "hive.fullname" . }}-metastore
+  labels:
+    app.kubernetes.io/component: metastore
+    {{- include "hive.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  ports:
+  - name: thrift
+    port: 9083
+    protocol: TCP
+  selector:
+    app.kubernetes.io/component: metastore
+    {{- include "hive.selectorLabels" . | nindent 4 }}
