@@ -40,18 +40,18 @@ spec:
           command:
             - /bin/bash
             - /opt/hive/bin/startup.sh
-{{/*        readinessProbe:*/}}
-{{/*          httpGet:*/}}
-{{/*            path: /*/}}
-{{/*            port: 10002*/}}
-{{/*          initialDelaySeconds: 5*/}}
-{{/*          timeoutSeconds: 2*/}}
-{{/*        livenessProbe:*/}}
-{{/*          httpGet:*/}}
-{{/*            path: /*/}}
-{{/*            port: 10002*/}}
-{{/*          initialDelaySeconds: 10*/}}
-{{/*          timeoutSeconds: 2*/}}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 10002
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 10002
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
           volumeMounts:
             - name: hive-config
               mountPath: /opt/hive/conf/hive-site.xml
