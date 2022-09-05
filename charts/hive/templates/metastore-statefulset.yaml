@@ -32,9 +32,10 @@ spec:
         resources:
         {{ toYaml .Values.metastore.resources | indent 10 }}
         volumeMounts:
-        - name: hive-config
-          mountPath: /opt/hive/conf
+          - name: hive-config
+            mountPath: /opt/hive/conf/hive-site.xml
+            subPath: hive-site.xml
       volumes:
-      - name: hive-config
-        configMap:
-          name: {{ include "hive.fullname" . }}-metastore
+        - name: hive-config
+          configMap:
+            name: {{ include "hive.fullname" . }}-metastore

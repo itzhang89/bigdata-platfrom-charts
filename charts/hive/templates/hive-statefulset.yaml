@@ -32,32 +32,36 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - name: server
-        securityContext:
+        - name: server
+          securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        command:
-          - /bin/bash
-          - /opt/hive/conf/startup.sh
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 10002
-          initialDelaySeconds: 5
-          timeoutSeconds: 2
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 10002
-          initialDelaySeconds: 10
-          timeoutSeconds: 2
-        volumeMounts:
-        - name: hive-config
-          mountPath: /opt/hive/conf
-        - name: hadoop-config
-          mountPath: /opt/hadoop/etc/hadoop
-        resources:
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - /opt/hive/bin/startup.sh
+{{/*        readinessProbe:*/}}
+{{/*          httpGet:*/}}
+{{/*            path: /*/}}
+{{/*            port: 10002*/}}
+{{/*          initialDelaySeconds: 5*/}}
+{{/*          timeoutSeconds: 2*/}}
+{{/*        livenessProbe:*/}}
+{{/*          httpGet:*/}}
+{{/*            path: /*/}}
+{{/*            port: 10002*/}}
+{{/*          initialDelaySeconds: 10*/}}
+{{/*          timeoutSeconds: 2*/}}
+          volumeMounts:
+            - name: hive-config
+              mountPath: /opt/hive/conf/hive-site.xml
+              subPath: hive-site.xml
+            - name: hive-config
+              mountPath: /opt/hive/bin/startup.sh
+              subPath: startup.sh
+            - name: hadoop-config
+              mountPath: /opt/hadoop/etc/hadoop
+          resources:
         {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
