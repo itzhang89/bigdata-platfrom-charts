@@ -18,6 +18,6 @@ A Bigdata Platform chart for Kubernetes.
 ## Getting Started
 
 ```bash
-$ git clone https://github.com/yutianaiqingtian/bigdata-platfrom-charts && cd bigdata-platfrom-charts
+$ git clone https://github.com/itzhang89/bigdata-platfrom-charts && cd bigdata-platfrom-charts
 $ helmfile apply
 ```
