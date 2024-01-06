@@ -9,8 +9,8 @@ Community developed LDAP software
 To install the chart with the release name `my-openldap`:
 
 ```console
-$ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
-$ helm upgrade --install my-openldap yutianaiqingtian/openldap --version 2.0.4
+$ helm repo add itzhang89 https://itzhang89.github.io/bigdata-platfrom-charts
+$ helm upgrade --install my-openldap itzhang89/openldap --version 2.0.4
 ```
 To uninstall the release
 

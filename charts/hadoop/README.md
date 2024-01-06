@@ -9,8 +9,8 @@ The Apache Hadoop software library is a framework that allows for the distribute
 To install the chart with the release name `my-hadoop`:
 
 ```console
-$ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
-$ helm upgrade --install my-hadoop yutianaiqingtian/hadoop --version 1.0.1
+$ helm repo add itzhang89 https://itzhang89.github.io/bigdata-platfrom-charts
+$ helm upgrade --install my-hadoop itzhang89/hadoop --version 1.0.1
 ```
 To uninstall the release
 

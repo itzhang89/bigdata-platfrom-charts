@@ -26,7 +26,7 @@ jobs:
           tar -xvf helm-docs_${{env.HELM_DOCS_VERSION}}_Linux_x86_64.tar.gz
           sudo mv helm-docs /usr/local/sbin
 
-      - name: Checkout yutianaiqingtian/bigdata-platfrom-charts
+      - name: Checkout itzhang89/bigdata-platfrom-charts
         uses: actions/checkout@v3
         with:
           fetch-depth: 0

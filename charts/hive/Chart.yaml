@@ -18,5 +18,5 @@ name: hive
 sources:
   - https://github.com/apache/hive
   - https://github.com/big-data-europe/docker-hive
-  - https://github.com/yutianaiqingtian/bigdata-charts
+  - https://github.com/itzhang89/bigdata-charts
 version: 0.2.0

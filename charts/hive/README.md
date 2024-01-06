@@ -9,8 +9,8 @@ The Apache Hive ™ data warehouse software facilitates reading, writing, and ma
 To install the chart with the release name `my-hive`:
 
 ```console
-$ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
-$ helm upgrade --install my-hive yutianaiqingtian/hive --version 0.1.8
+$ helm repo add itzhang89 https://itzhang89.github.io/bigdata-platfrom-charts
+$ helm upgrade --install my-hive itzhang89/hive --version 0.1.8
 ```
 To uninstall the release
 
