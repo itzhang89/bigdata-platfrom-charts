@@ -9,8 +9,8 @@ Hue is an SQL Cloud Editor for Data Warehouses and Databases.
 To install the chart with the release name `my-hue`:
 
 ```console
-$ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
-$ helm upgrade --install my-hue yutianaiqingtian/hue --version 1.0.4
+$ helm repo add itzhang89 https://itzhang89.github.io/bigdata-platfrom-charts
+$ helm upgrade --install my-hue itzhang89/hue --version 1.0.4
 ```
 To uninstall the release
 

@@ -9,8 +9,8 @@ Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow schedu
 To install the chart with the release name `my-dolphinscheduler`:
 
 ```console
-$ helm repo add yutianaiqingtian https://yutianaiqingtian.github.io/bigdata-platfrom-charts
-$ helm upgrade --install my-dolphinscheduler yutianaiqingtian/dolphinscheduler --version 2.0.0
+$ helm repo add itzhang89 https://itzhang89.github.io/bigdata-platfrom-charts
+$ helm upgrade --install my-dolphinscheduler itzhang89/dolphinscheduler --version 2.0.0
 ```
 To uninstall the release
 

@@ -3,50 +3,78 @@ kind: StatefulSet
 metadata:
   name: {{ include "hive.fullname" . }}-hiveserver
   labels:
-    app.kubernetes.io/name: {{ include "hive.name" . }}
-    app.kubernetes.io/component: server
+    app.kubernetes.io/component: hive
     {{- include "hive.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "hive.name" . }}
-      app.kubernetes.io/component: server
-      app.kubernetes.io/instance: {{ .Release.Name | quote }}
+      app.kubernetes.io/component: hive
+      {{- include "hive.selectorLabels" . | nindent 6 }}
   serviceName: {{ include "hive.fullname" . }}-hiveserver
-  replicas: 1
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
-        app.kubernetes.io/name: {{ include "hive.name" . }}
-        app.kubernetes.io/component: server
-        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        app.kubernetes.io/component: hive
+        {{- include "hive.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "hive.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      - name: server
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
-        command:
-          - /bin/bash
-          - /opt/hive/conf/startup.sh
-        resources:
-{{ toYaml .Values.resources | indent 10 }}
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 10002
-          initialDelaySeconds: 5
-          timeoutSeconds: 2
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 10002
-          initialDelaySeconds: 10
-          timeoutSeconds: 2
-        volumeMounts:
-        - name: hive-config
-          mountPath: /opt/hive/conf
-        - name: hadoop-config
-          mountPath: /opt/hadoop/etc/hadoop
+        - name: server
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - /opt/hive/bin/startup.sh
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 10002
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 10002
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+          volumeMounts:
+            - name: hive-config
+              mountPath: /opt/hive/conf/hive-site.xml
+              subPath: hive-site.xml
+            - name: hive-config
+              mountPath: /opt/hive/bin/startup.sh
+              subPath: startup.sh
+            - name: hadoop-config
+              mountPath: /opt/hadoop/etc/hadoop
+          resources:
+        {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
       - name: hive-config
         configMap:

@@ -5,7 +5,7 @@
     {{- if not (index .Values.conf "hiveSite" "hive.metastore.uris") }}
     <property>
         <name>hive.metastore.uris</name>
-        <value>thrift://{{ template "hive.hive-metastore" . }}:9083</value>
+        <value>thrift://{{ include "hive.fullname" . }}-metastore:9083</value>
     </property>
     {{- end }}
 

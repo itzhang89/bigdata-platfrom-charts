@@ -1,16 +1,16 @@
 OpenLDAP has been installed. You can access the server from within the k8s cluster using:
 
-  {{ template "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.ldapPort }}
+  {{ include "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.ldapPort }}
 
 
 You can access the LDAP adminPassword and configPassword using:
 
-  kubectl get secret --namespace {{ .Release.Namespace }} {{ template "openldap.secretName" . }} -o jsonpath="{.data.LDAP_ADMIN_PASSWORD}" | base64 --decode; echo
-  kubectl get secret --namespace {{ .Release.Namespace }} {{ template "openldap.secretName" . }} -o jsonpath="{.data.LDAP_CONFIG_PASSWORD}" | base64 --decode; echo
+  kubectl get secret --namespace {{ .Release.Namespace }} {{ include "openldap.fullname" . }}-sec -o jsonpath="{.data.LDAP_ADMIN_PASSWORD}" | base64 --decode; echo
+  kubectl get secret --namespace {{ .Release.Namespace }} {{ include "openldap.fullname" . }}-sec -o jsonpath="{.data.LDAP_CONFIG_PASSWORD}" | base64 --decode; echo
 
 
 You can access the LDAP service, from within the cluster (or with kubectl port-forward) with a command like (replace password and domain):
-  ldapsearch -x -H ldap://{{ template "openldap.fullname" . }}-service.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.ldapPort }} -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w $LDAP_ADMIN_PASSWORD
+  ldapsearch -x -H ldap://{{ include "openldap.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:389 -b dc=example,dc=org -D "cn=admin,dc=example,dc=org" -w $LDAP_ADMIN_PASSWORD
 
 
 Test server health using Helm test:
@@ -18,3 +18,44 @@ Test server health using Helm test:
 
 
 You can also consider installing the helm chart for phpldapadmin to manage this instance of OpenLDAP, or install Apache Directory Studio, and connect using kubectl port-forward.
+
+1. Get the application URL by running these commands:
+{{- if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{- .Release.Namespace -}} -o jsonpath="{.spec.ports[0].nodePort}" services {{ printf "%s" (include "openldap.fullname" .) }})
+  export NODE_IP=$(kubectl get nodes --namespace {{- .Release.Namespace -}} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get svc -w {{ printf "%s" (include "openldap.fullname" .) }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{- .Release.Namespace -}} {{ printf "%s" (include "openldap.fullname" .) }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:80
+{{- else if contains "ClusterIP" .Values.service.type }}
+
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "openldap.fullname" . }} 80:80
+  echo "Visit http://127.0.0.1:80 to use your application"
+
+{{- end }}
+
+{{- if .Values.phpldapadmin.enabled }}
+
+for phpldapadmin web ui
+
+1. Get the application URL by running these commands:
+{{- if contains "NodePort" .Values.phpldapadmin.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "openldap.fullname" . }}-phpldapadmin)
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.phpldapadmin.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status of by running 'kubectl get svc -w {{ include "openldap.fullname" . }}-phpldapadmin'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "openldap.fullname" . }}-phpldapadmin -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  echo http://$SERVICE_IP:80
+{{- else if contains "ClusterIP" .Values.phpldapadmin.service.type }}
+
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "openldap.fullname" . }}-phpldapadmin 80:80
+  echo "Visit http://127.0.0.1:80 to use your application"
+
+{{- end }}
+{{- end }}
+
+** Please be patient while the chart is being deployed **

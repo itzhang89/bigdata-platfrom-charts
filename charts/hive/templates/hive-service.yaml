@@ -4,10 +4,10 @@ kind: Service
 metadata:
   name: {{ include "hive.fullname" . }}-hiveserver
   labels:
-    app.kubernetes.io/name: {{ include "hive.name" . }}
-    app.kubernetes.io/component: server
+    app.kubernetes.io/component: hive
     {{- include "hive.labels" . | nindent 4 }}
 spec:
+  clusterIP: None
   ports:
   - name: thrift
     port: 10000
@@ -16,6 +16,5 @@ spec:
     port: 10002
     protocol: TCP
   selector:
-    app.kubernetes.io/name: {{ include "hive.name" . }}
-    app.kubernetes.io/component: server
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: hive
+    {{- include "hive.selectorLabels" . | nindent 4 }}

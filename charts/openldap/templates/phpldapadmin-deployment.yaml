@@ -1,0 +1,62 @@
+{{- if .Values.phpldapadmin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openldap.fullname" . }}-phpldapadmin
+  labels:
+    app.kubernetes.io/component: phpldapadmin
+    {{- include "openldap.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.phpldapadmin.autoscaling.enabled }}
+  replicas: {{ .Values.phpldapadmin.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: phpldapadmin
+      {{- include "openldap.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.phpldapadmin.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/component: phpldapadmin
+        {{- include "openldap.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: phpldapadmin
+          securityContext:
+            {{- toYaml .Values.phpldapadmin.securityContext | nindent 12 }}
+          image: "{{ .Values.phpldapadmin.image.repository }}:{{ .Values.phpldapadmin.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.phpldapadmin.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "openldap.fullname" . }}-phpldapadmin-env
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.phpldapadmin.resources | nindent 12 }}
+      {{- with .Values.phpldapadmin.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.phpldapadmin.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.phpldapadmin.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

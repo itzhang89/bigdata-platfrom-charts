@@ -16,7 +16,7 @@ name: hue
 sources:
   - https://github.com/cloudera/hue
   - https://hub.docker.com/u/gethue
-  - https://github.com/yutianaiqingtian/bigdata-charts
+  - https://github.com/itzhang89/bigdata-charts
 version: 1.0.4
 dependencies:
   - condition: postgresql.enabled

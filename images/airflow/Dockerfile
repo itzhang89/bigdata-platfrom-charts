@@ -1,7 +1,7 @@
 # VERSION 2.3.2
 # DESCRIPTION: Single Basic Airflow container
 # BUILD: docker build --rm -t 5200710/airflow:2.3.2 .
-# SOURCE: https://github.com/yutianaiqingtian/basic-env-build/releases/tag/airflow-2.3.2
+# SOURCE: https://github.com/itzhang89/basic-env-build/releases/tag/airflow-2.3.2
 
 FROM python:3.10.5-slim-buster
 LABEL maintainer="www.ilovestudy.top"
