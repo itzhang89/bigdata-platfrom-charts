@@ -4,9 +4,9 @@ image:
   # -- hadoop Docker image repository. eg. [Docker Hub| Hadoop ](https://hub.docker.com/repository/docker/5200710/hadoop)
   repository: 5200710/hadoop
   # -- hadoop Docker image tag
-  tag: 3.2.3-java8
+  tag: 3.3.5
   # -- hadoop Docker image pullPolicy
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 # Select antiAffinity as either hard or soft, default is 'soft'
 # 'hard' is sugested for production setup
@@ -20,6 +20,8 @@ conf:
   # -- conf.hdfsSite this configuration will take effect in the hdfs-site.xml file
   hdfsSite:
     dfs.replication: 3  # when changing this value ensure that dataNode.replicas is equal or higher than this value
+    dfs.permissions.enabled: false
+    dfs.webhdfs.enable: true
     # dfs.datanode.du.reserved: "4294967296"  # number of bytes to reserve on disk to block hitting disk full, must be quoted for large numbers, because of gotemplate converting large numbers to float with scientific notation
   # -- conf.httpfsSite this configuration will take effect in the httpfs-site.xml file
   httpfsSite: { }
@@ -83,8 +85,8 @@ resourcemanager:
     loadBalancerIP: null
   resources:
     requests:
-      memory: "1024Mi"
-      cpu: "500m"
+      memory: "512Mi"
+      cpu: "250m"
     limits:
       memory: "4096Mi"
       cpu: "2000m"
@@ -94,14 +96,14 @@ nodemanager:
   port: 8088
   httpPort: 8042
   httpsPort: 443
-  pdbMinAvailable: 3
+  pdbMinAvailable: 1
   resources:
     requests:
-      memory: "8192Mi"
-      cpu: "4000m"
+      memory: "512Mi"
+      cpu: "250m"
     limits:
-      memory: "8192Mi"
-      cpu: "4000m"
+      memory: "4096Mi"
+      cpu: "2000m"
 
 historyserver:
   enabled: true
@@ -214,7 +216,7 @@ prometheus:
   exporter:
     image:
       repository: marcelmay/hadoop-hdfs-fsimage-exporter
-      tag: 1.3
+      tag: 1.4.7
       pullPolicy: IfNotPresent
     enabled: true
     port: 5556
