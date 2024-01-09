@@ -2,10 +2,29 @@
 
 : ${HADOOP_HOME:=/opt/hadoop}
 
+function update_hadoop_env() {
+  local env_file="$HADOOP_HOME/etc/hadoop/hadoop-env.sh"
+  local env_name="$1"
+  local env_value="$2"
+
+  if [[ $(grep "^# export $env_name=" "$env_file" | wc -l) -eq 1 ]]; then
+    # If there is a comment, uncomment line with a new environment variable
+    sed -i "s|^# export $env_name=.*|export $env_name=\"$env_value\"|" "$env_file"
+    echo "Updated $env_name in $env_file"
+  else
+    # append the new to end of the file
+    echo "export $env_name=\"$env_value\"" >>"$env_file"
+    echo "Added $env_name to $env_file"
+  fi
+}
+
 # setup the java home if not special
-[[ -z "$JAVA_HOME" ]] && JAVA_HOME=$(dirname $(dirname $(readlink -f $(which javac))))
+[[ -z "$JAVA_HOME" ]] && JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:jre/bin/java::")
 # replace the java_home in the hadoop-env file
-sed -i "s|#\s*JAVA_HOME=.*|export JAVA_HOME=\"$JAVA_HOME\"|" $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+update_hadoop_env JAVA_HOME $JAVA_HOME
+update_hadoop_env HADOOP_COMMON_LIB_NATIVE_DIR ${HADOOP_HOME}/lib/native
+HADOOP_OPTS+="-Djava.library.path=$HADOOP_HOME/lib/native"
+update_hadoop_env HADOOP_OPTS "$HADOOP_OPTS"
 
 . $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
@@ -44,12 +63,12 @@ if [[ $2 == "datanode" ]]; then
   export HADOOP_LOG_DIR=/var/log/hadoop/hdfs
   mkdir -p $HADOOP_LOG_DIR && chown -R hdfs:hadoop $HADOOP_LOG_DIR && chmod g+s $HADOOP_LOG_DIR
   #  wait up to 30 seconds for namenode
-#  (while [[ $count -lt 15 && -z $(curl -sf http://{{ include "hadoop.fullname" . }}-namenode:9870) && -z $(curl -sf http://{{ include "hadoop.fullname" . }}-namenode:50070) ]]; do
-#    ((count = count + 1))
-#    echo "Waiting for {{ include "hadoop.fullname" . }}-namenode"
-#    sleep 2
-#  done && [[ $count -lt 15 ]])
-#  [[ $? -ne 0 ]] && echo "Timeout waiting for hdfs namenode, exiting." && exit 1
+  #  (while [[ $count -lt 15 && -z $(curl -sf http://{{ include "hadoop.fullname" . }}-namenode:9870) && -z $(curl -sf http://{{ include "hadoop.fullname" . }}-namenode:50070) ]]; do
+  #    ((count = count + 1))
+  #    echo "Waiting for {{ include "hadoop.fullname" . }}-namenode"
+  #    sleep 2
+  #  done && [[ $count -lt 15 ]])
+  #  [[ $? -ne 0 ]] && echo "Timeout waiting for hdfs namenode, exiting." && exit 1
 
   su hdfs -c "$HADOOP_HOME/sbin/hadoop-daemon.sh start datanode"
 fi
@@ -62,13 +81,13 @@ if [[ $2 == "httpfs" ]]; then
   export HTTPFS_TEMP=/tmp
   export HADOOP_LOG_DIR=/var/log/hadoop/httpfs
   mkdir -p $HADOOP_LOG_DIR && chown -R httpfs:httpfs $HADOOP_LOG_DIR && chmod g+s $HADOOP_LOG_DIR
-#  #  wait up to 30 seconds for namenode
-#  (while [[ $count -lt 15 && -z $(curl -sf http://{{ include "hadoop.fullname" . }}-namenode:9870) && -z $(curl -sf http://{{ include "hadoop.fullname" . }}-namenode:50070) ]]; do
-#    ((count = count + 1))˜
-#    echo "Waiting for {{ include "hadoop.fullname" . }}-namenode"
-#    sleep 2
-#  done && [[ $count -lt 15 ]])
-#  [[ $? -ne 0 ]] && echo "Timeout waiting for hdfs namenode, exiting." && exit 1
+  #  #  wait up to 30 seconds for namenode
+  #  (while [[ $count -lt 15 && -z $(curl -sf http://{{ include "hadoop.fullname" . }}-namenode:9870) && -z $(curl -sf http://{{ include "hadoop.fullname" . }}-namenode:50070) ]]; do
+  #    ((count = count + 1))˜
+  #    echo "Waiting for {{ include "hadoop.fullname" . }}-namenode"
+  #    sleep 2
+  #  done && [[ $count -lt 15 ]])
+  #  [[ $? -ne 0 ]] && echo "Timeout waiting for hdfs namenode, exiting." && exit 1
 
   su httpfs -c "$HADOOP_HOME/bin/hdfs --daemon start httpfs"
 fi
@@ -90,9 +109,9 @@ if [[ $2 == "nodemanager" ]]; then
   export HADOOP_LOG_DIR=/var/log/hadoop/yarn
   mkdir -p $HADOOP_LOG_DIR && chown -R yarn:hadoop $HADOOP_LOG_DIR && chmod g+s $HADOOP_LOG_DIR
   # Wait with timeout for resourcemanager
-#  TMP_URL="http://{{ include "hadoop.fullname" . }}-resourcemanager-hl:8088/ws/v1/cluster/info"
-#  if timeout 5m bash -c "until curl -sf $TMP_URL; do echo Waiting for $TMP_URL; sleep 5; done"; then
-    su yarn -c "$HADOOP_HOME/bin/yarn nodemanager --loglevel {{ .Values.logLevel }}"
+  #  TMP_URL="http://{{ include "hadoop.fullname" . }}-resourcemanager-hl:8088/ws/v1/cluster/info"
+  #  if timeout 5m bash -c "until curl -sf $TMP_URL; do echo Waiting for $TMP_URL; sleep 5; done"; then
+  su yarn -c "$HADOOP_HOME/bin/yarn nodemanager --loglevel {{ .Values.logLevel }}"
 #  else
 #    echo "$0: Timeout waiting for $TMP_URL, exiting."
 #    exit 1
@@ -104,8 +123,8 @@ fi
 if [[ $2 == "historyserver" ]]; then
   export HADOOP_LOG_DIR=/var/log/hadoop/mapred
   mkdir -p $HADOOP_LOG_DIR && chown -R mapred:hadoop $HADOOP_LOG_DIR && chmod g+s $HADOOP_LOG_DIR
-#  if timeout 5m bash -c "until nc -vz {{ include "hadoop.fullname" . }}-namenode {{ .Values.nameNode.port }} -w2; do echo Waiting for namenode; sleep 5; done"; then
-    su mapred -c "$HADOOP_HOME/bin/mapred --loglevel {{ .Values.logLevel }} --daemon start historyserver"
+  #  if timeout 5m bash -c "until nc -vz {{ include "hadoop.fullname" . }}-namenode {{ .Values.nameNode.port }} -w2; do echo Waiting for namenode; sleep 5; done"; then
+  su mapred -c "$HADOOP_HOME/bin/mapred --loglevel {{ .Values.logLevel }} --daemon start historyserver"
 #  else
 #    echo "$0: Timeout waiting for namenode, exiting."
 #    exit 1
