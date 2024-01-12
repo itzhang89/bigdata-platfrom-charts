@@ -1,6 +1,6 @@
 image:
   repository: 5200710/hive
-  tag: 3.1.3-postgresql-metastore
+  tag: 3.1.3
 #  pullPolicy: Always
 
 conf:
@@ -31,30 +31,30 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-podAnnotations: {}
-podSecurityContext: {}
-  # fsGroup: 2000
+podAnnotations: { }
+podSecurityContext: { }
+# fsGroup: 2000
 
-securityContext: {}
+securityContext: { }
   # capabilities:
   #   drop:
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
+# runAsUser: 1000
 
 ingress:
   enabled: false
   className: ""
-  annotations: {}
+  annotations: { }
     # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: hive-example.local
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: []
+  tls: [ ]
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
@@ -63,7 +63,7 @@ ingress:
 metastore:
   image:
     repository: 5200710/hive
-    tag: 3.1.3-postgresql-metastore
+    tag: 3.1.3
 
   #  pullPolicy: Always
   connections:
