@@ -2,7 +2,7 @@ name: hive-image
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     # Publish semver tags as releases.
     paths:
       - images/hive/conf/*
