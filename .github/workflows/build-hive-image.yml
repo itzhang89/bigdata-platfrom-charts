@@ -46,19 +46,14 @@ jobs:
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v41
-        with:
-          write_output_files: true
-          dir_names: true
-          dir_names_include_files: |
-            images/hive/conf/*
-            images/hive/Dockerfile
-            images/hive/entrypoint.sh
-            images/hive/README.md
 
-        # Ref: https://github.com/tj-actions/changed-files?tab=readme-ov-file#output_all_changed_and_modified_files
-      - name: Verify the contents of the .github/outputs/all_changed_and_modified_files.txt file
+      - name: List all changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
-          cat .github/outputs/all_changed_and_modified_files.txt
+          for file in "$ALL_CHANGED_FILES"; do
+            echo "$file was changed"
+          done
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
