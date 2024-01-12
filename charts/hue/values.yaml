@@ -1,6 +1,6 @@
 image:
   registry: gethue/hue
-  tag: 4.10.0
+  tag: 4.11.0
   pullPolicy: IfNotPresent
 
 service:
