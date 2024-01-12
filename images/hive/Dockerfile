@@ -1,60 +1,48 @@
-FROM 5200710/hadoop:3.2.3-java8
+# 构建阶段
+ARG TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
+FROM --platform=${TARGETPLATFORM} ubuntu:focal AS builder
 
-MAINTAINER itzhang89 <itzhang89@163.com>
-
-# Allow buildtime config of HIVE_VERSION
-ARG HIVE_VERSION
-# Set HIVE_VERSION from arg if provided at build, env if provided at run, or default
-# https://docs.docker.com/engine/reference/builder/#using-arg-variables
-# https://docs.docker.com/engine/reference/builder/#environment-replacement
-ENV HIVE_VERSION=${HIVE_VERSION:-3.1.3}
-ENV PG_LIB_VERSION=${PG_LIB_VERSION:-42.4.0}
-
-ENV HIVE_HOME /opt/hive
-ENV PATH $HIVE_HOME/bin:$PATH
-ENV HADOOP_HOME /opt/hadoop-$HADOOP_VERSION
-
-WORKDIR /opt
+# optionally default hadoop version:
+ARG HIVE_VERSION=3.1.3
+ARG PG_LIB_VERSION=42.4.0
+RUN apt-get update && apt-get install -y curl
 
 #Install Hive and PostgreSQL JDBC
 RUN apt-get update && apt-get install -y procps && \
-	curl -kfSLO https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-	tar -xzvf apache-hive-$HIVE_VERSION-bin.tar.gz -C /opt && \
-	ln -s apache-hive-$HIVE_VERSION-bin hive && \
-    curl -kfSL https://jdbc.postgresql.org/download/postgresql-$PG_LIB_VERSION.jar -o $HIVE_HOME/lib/postgresql-jdbc.jar && \
-	rm apache-hive-$HIVE_VERSION-bin.tar.gz && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
+	curl -kfSLO https://archive.apache.org/dist/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz -o /tmp/apache-hive-${HIVE_VERSION}-bin.tar.gz \
+	&& tar -xzvf /tmp/apache-hive-${HIVE_VERSION}-bin.tar.gz -C /opt \
+    && rm -rf /tmp/hadoop-${HADOOP_VERSION}.tar.gz \
+	&& mv /opt/apache-hive-${HIVE_VERSION}-bin /opt/hive \
+    && curl -kfSL https://jdbc.postgresql.org/download/postgresql-$PG_LIB_VERSION.jar -o /opt/hive/lib/postgresql-jdbc.jar \
+    && find /opt/hive/ -type f \( -name "*.bat" -o -name "*.dll" -o -name "*.exe" -o -name "*.cmd" -o -name "*-tests.jar" -o -name "*-sources.jar" \) -delete
+
+
+# 运行阶段
+ARG HADOOP_BASE_IMAGE
+ARG TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
+FROM --platform=${TARGETPLATFORM} ${HADOOP_BASE_IMAGE}
+
+MAINTAINER itzhang89 <itzhang89@163.com>
+
+ARG HIVE_VERSION=3.1.3
+ENV HIVE_HOME /opt/hive
+ENV PATH $HIVE_HOME/bin:$PATH
 
 # replace the low version guava jar on hive
 RUN rm -rf $HIVE_HOME/lib/guava-19.0.jar \
     && cp $HADOOP_HOME/share/hadoop/common/lib/guava-27.0-jre.jar $HIVE_HOME/lib/ \
     && rm -rf $HIVE_HOME/lib/postgresql-9.4.1208.jre7.jar
 
-#Custom configuration goes here
-ADD conf/hive-site.xml $HIVE_HOME/conf
-ADD conf/beeline-log4j2.properties $HIVE_HOME/conf
-ADD conf/hive-env.sh $HIVE_HOME/conf
-ADD conf/hive-exec-log4j2.properties $HIVE_HOME/conf
-ADD conf/hive-log4j2.properties $HIVE_HOME/conf
-ADD conf/ivysettings.xml $HIVE_HOME/conf
-ADD conf/llap-daemon-log4j2.properties $HIVE_HOME/conf
-
-COPY startup.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/startup.sh
-
-COPY startup-metastore.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/startup-metastore.sh
-
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
 # create hive user and group
-RUN groupadd -g 971 -r hive \
-    && useradd --comment "Hive User" -u 971 --shell /bin/bash -M -r -N --groups hadoop,hive --home /var/lib/hadoop/hive hive
+RUN useradd -r -m -U -s /bin/bash --groups hadoop hive
 
-EXPOSE 10000
-EXPOSE 10002
+#Custom configuration goes here
+COPY --chown=hive:hadoop conf/* $HIVE_HOME/conf/
+COPY --chown=hive:hadoop startup.sh /usr/local/bin/
+COPY --chown=hive:hadoop startup-metastore.sh /usr/local/bin/
+COPY --chown=hive:hadoop entrypoint.sh /usr/local/bin/
+
+EXPOSE 10000 10002
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD startup.sh

@@ -1,0 +1,104 @@
+name: hive-image
+
+on:
+  push:
+    branches: [ "master" ]
+    # Publish semver tags as releases.
+    paths:
+      - images/hive/conf/*
+      - images/hive/Dockerfile
+      - images/hive/entrypoint.sh
+      - images/hive/README.md
+  workflow_dispatch:
+    inputs:
+      hadoop_version:
+        description: 'hadoop version'
+        required: true
+        default: 3.3.5
+      hive_version:
+        description: 'hive version'
+        required: true
+        default: 3.1.3
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: docker.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/hive
+  HADOOP_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/hadoop
+  HADOOP_VERSION: ${{ github.event.inputs.hadoop_version || '3.3.5' }}
+  HIVE_VERSION: ${{ github.event.inputs.hive_version || '3.1.3' }}
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Workaround: https://github.com/tj-actions/changed-files
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          write_output_files: true
+          dir_names: true
+          dir_names_include_files: |
+            images/hive/conf/*
+            images/hive/Dockerfile
+            images/hive/entrypoint.sh
+            images/hive/README.md
+
+        # Ref: https://github.com/tj-actions/changed-files?tab=readme-ov-file#output_all_changed_and_modified_files
+      - name: Verify the contents of the .github/outputs/all_changed_and_modified_files.txt file
+        run: |
+          cat .github/outputs/all_changed_and_modified_files.txt
+
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Workaround: https://github.com/docker/setup-buildx-action
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push hive Docker image
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.changed-files.outputs.any_changed == 'true' }}
+        id: hive-build-and-push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./images/hive
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: |
+            HADOOP_BASE_IMAGE=${{ env.REGISTRY }}/${{ env.HADOOP_IMAGE_NAME }}:${{ env.HADOOP_VERSION }}
+            HIVE_VERSION=${{ env.HIVE_VERSION }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.HIVE_VERSION }}
+          platforms: linux/amd64,linux/arm64
+          labels: |
+            HIVE_VERSION=${{ env.HIVE_VERSION }}
+            HADOOP_VERSION=${{ env.HADOOP_VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Workaround: https://github.com/marketplace/actions/docker-hub-description
+      - name: Update Docker Hub Description
+        if: contains(steps.changed-files.outputs.all_changed_and_modified_files, 'images/hive/README.md')
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          readme-filepath: hive/images/README.md
