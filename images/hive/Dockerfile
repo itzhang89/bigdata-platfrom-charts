@@ -27,7 +27,13 @@ COPY --chown=hive:hadoop conf/* $HIVE_HOME/conf/
 COPY --chown=hive:hadoop entrypoint.sh /usr/local/bin/
 COPY --chown=hive:hadoop bootstrap.sh /usr/local/bin/
 
+# persist the env to /etc/environment
+RUN echo "HIVE_HOME=/opt/hive" >> /etc/environment \
+    && echo "PATH=$HIVE_HOME/bin:\$PATH" >> /etc/environment
+
 EXPOSE 10000 10002
+
+WORKDIR /opt/hive
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD bootstrap.sh
