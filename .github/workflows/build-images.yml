@@ -10,8 +10,8 @@ on:
       - main
       - release/*
     paths:
-      - images/**/Dockerfile
-      - images/*/*.dockerfile
+      - images/airflow/*
+      - images/spark/*
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+: ${HIVE_HOME:=/opt/hive}
+
 # Set some sensible defaults
 export CORE_CONF_fs_defaultFS=${CORE_CONF_fs_defaultFS:-hdfs://$(hostname -f):9820}
 
@@ -16,7 +18,7 @@ function addProperty() {
 function configure() {
   local path=$1
   local module=$2
-  envPrefix="$(echo "${module}_CONF" | tr '[:lower:]' '[:upper:]')"
+  envPrefix="$(echo "${3:-${2}_CONF}" | tr '[:lower:]' '[:upper:]')"
 
   local var
   local value
@@ -37,7 +39,12 @@ for module in "${modules[@]}"; do
   configure "/etc/hadoop/${module}-site.xml" "${module}"
 done
 
-configure /opt/hive/conf/hive-site.xml hive
+# configure hive
+for f in ${HIVE_HOME}/conf/*.sh.template ${HIVE_HOME}/conf/*.properties.template; do
+  mv $f "${f%.template}"
+done
+
+configure /opt/hive/conf/hive-site.xml hive HIVE_SITE_CONF
 
 if [ "$MULTIHOMED_NETWORK" = "1" ]; then
   echo "Configuring for multihomed network"
