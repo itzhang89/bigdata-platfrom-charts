@@ -16,7 +16,7 @@ function addProperty() {
 function configure() {
   local path=$1
   local module=$2
-  local envPrefix=$3
+  envPrefix="$(echo "${module}_CONF" | tr '[:lower:]' '[:upper:]')"
 
   local var
   local value
@@ -27,16 +27,16 @@ function configure() {
     var="${envPrefix}_${c}"
     value=${!var}
     echo " - Setting $name=$value"
-    addProperty /etc/hadoop/$module-site.xml $name "$value"
+    addProperty $path $name "$value"
   done
 }
 
-configure /etc/hadoop/core-site.xml core CORE_CONF
-configure /etc/hadoop/hdfs-site.xml hdfs HDFS_CONF
-configure /etc/hadoop/yarn-site.xml yarn YARN_CONF
-configure /etc/hadoop/httpfs-site.xml httpfs HTTPFS_CONF
-configure /etc/hadoop/kms-site.xml kms KMS_CONF
-configure /etc/hadoop/mapred-site.xml mapred MAPRED_CONF
+# configure the properties from the env. eg: configure /etc/hadoop/core-site.xml core CORE_CONF
+modules=(core hdfs yarn httpfs kms mapred)
+for module in "${modules[@]}"; do
+  configure "/etc/hadoop/${module}-site.xml" "${module}"
+done
+
 
 if [ "$MULTIHOMED_NETWORK" = "1" ]; then
   echo "Configuring for multihomed network"
