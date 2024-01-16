@@ -23,6 +23,7 @@ FROM --platform=${TARGETPLATFORM} ubuntu:focal
 MAINTAINER itzhang89 <itzhang89@163.com>
 
 ENV HADOOP_HOME /opt/hadoop
+ENV PATH $HADOOP_HOME/bin:$PATH
 ENV HADOOP_CONF_DIR /etc/hadoop
 
 # install extra packages
@@ -43,6 +44,6 @@ RUN ln -s $HADOOP_HOME/etc/hadoop /etc/hadoop && \
 RUN echo "JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:jre/bin/java::')" >> /etc/environment \
     && echo "HADOOP_HOME=/opt/hadoop" >> /etc/environment \
     && echo "HADOOP_CONF_DIR=/etc/hadoop" >> /etc/environment \
-    && echo "PATH=$HADOOP_HOME/bin:\$PATH" >> /etc/environment
+    && sed -i "s|PATH=.*|PATH=\"$PATH\"|" /etc/environment
 
 WORKDIR $HADOOP_HOME

@@ -29,7 +29,7 @@ COPY --chown=hive:hadoop bootstrap.sh /usr/local/bin/
 
 # persist the env to /etc/environment
 RUN echo "HIVE_HOME=/opt/hive" >> /etc/environment \
-    && echo "PATH=$HIVE_HOME/bin:\$PATH" >> /etc/environment
+    && sed -i "s|PATH=.*|PATH=\"$PATH\"|" /etc/environment
 
 EXPOSE 10000 10002
 
