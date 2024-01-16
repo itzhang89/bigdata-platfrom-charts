@@ -82,7 +82,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build and push Hadoop Docker image
-        if: ${{ github.event_name == 'workflow_dispatch' || contains(steps.changed-files.outputs.all_changed_files, 'images/hadoop/Dockerfile') || contains(steps.changed-files.outputs.all_changed_files, 'images/hadoop/entrypoint.sh') }}
+        if: ${{ github.event_name == 'workflow_dispatch' || contains(steps.changed-files.outputs.all_changed_files, 'images/hadoop/') }}
         id: hadoop-build-and-push
         uses: docker/build-push-action@v3
         with:

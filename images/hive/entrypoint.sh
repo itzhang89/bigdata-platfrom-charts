@@ -39,11 +39,6 @@ for module in "${modules[@]}"; do
   configure "/etc/hadoop/${module}-site.xml" "${module}"
 done
 
-# configure hive
-for f in ${HIVE_HOME}/conf/*.sh.template ${HIVE_HOME}/conf/*.properties.template; do
-  mv $f "${f%.template}"
-done
-
 configure /opt/hive/conf/hive-site.xml hive HIVE_SITE_CONF
 
 if [ "$MULTIHOMED_NETWORK" = "1" ]; then

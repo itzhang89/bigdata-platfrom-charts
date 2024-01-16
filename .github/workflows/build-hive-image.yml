@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
     # Publish semver tags as releases.
     paths:
+      - images/hive/base/Dockerfile
       - images/hive/conf/*
       - images/hive/Dockerfile
       - images/hive/entrypoint.sh
@@ -48,6 +49,7 @@ jobs:
         uses: tj-actions/changed-files@v41
         with:
           files: |
+            images/hive/base/Dockerfile
             images/hive/conf/*
             images/hive/Dockerfile
             images/hive/entrypoint.sh
@@ -77,16 +79,33 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
 
+      - name: Build and push Hive Base Docker image
+        if: ${{ github.event_name == 'workflow_dispatch' || contains(steps.changed-files.outputs.all_changed_files, 'images/hive/base') }}
+        id: hive-base-build-and-push
+        uses: docker/build-push-action@v3
+        with:
+          context: ./images/hive/base
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: |
+            HADOOP_BASE_IMAGE=${{ env.REGISTRY }}/${{ env.HADOOP_IMAGE_NAME }}:${{ env.HADOOP_VERSION }}
+            HIVE_VERSION=${{ env.HIVE_VERSION }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.HIVE_VERSION }}-base
+          platforms: linux/amd64,linux/arm64
+          labels: |
+            HIVE_VERSION=${{ env.HIVE_VERSION }}
+            HADOOP_VERSION=${{ env.HADOOP_VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build and push hive Docker image
-        if: ${{ github.event_name == 'workflow_dispatch' || steps.changed-files.outputs.any_changed == 'true' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || contains(steps.changed-files.outputs.all_changed_files, 'images/hive/') }}
         id: hive-build-and-push
         uses: docker/build-push-action@v3
         with:
           context: ./images/hive
           push: ${{ github.event_name != 'pull_request' }}
           build-args: |
-            HADOOP_BASE_IMAGE=${{ env.REGISTRY }}/${{ env.HADOOP_IMAGE_NAME }}:${{ env.HADOOP_VERSION }}
-            HIVE_VERSION=${{ env.HIVE_VERSION }}
+            HIVE_BASE_IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.HIVE_VERSION }}-base
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.HIVE_VERSION }}
           platforms: linux/amd64,linux/arm64
           labels: |
